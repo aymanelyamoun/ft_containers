@@ -1,19 +1,10 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
-#include "vector.hpp"
-
-void f(volatile int &x)
-{
-    std::cout << x << " lvalue" << std::endl;
-}
-
+// #include "vector.hpp"
 int main()
 {
-    int num;
 
-    num = 100;
-    f(num);
     // ft::vector<int> vec;
     // ft::vector<int>::iterator it;
     // std::vector<std::string> vec2;
