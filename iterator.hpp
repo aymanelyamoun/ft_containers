@@ -65,11 +65,11 @@ namespace ft{
             iterator_wrap   &operator--(){ it-- ; return *this;}
             iterator_wrap   operator--(int){ iterator_wrap tmp(*this); --(*this); return tmp; }
 
-            iterator_wrap   operator+(difference_type n) { iterator_wrap tmp(*this) ; tmp =+ n; return (tmp); }
-            iterator_wrap   operator-(difference_type n) { iterator_wrap tmp(*this) ; tmp =- n; return (tmp); }
+            iterator_wrap   operator+(difference_type n) { iterator_wrap tmp(*this) ; tmp += n; return (tmp); }
+            iterator_wrap   operator-(difference_type n) { iterator_wrap tmp(*this) ; tmp -= n; return (tmp); }
 
-            iterator_wrap   &operator-=(difference_type n) { it =- n; return (*this); }
-            iterator_wrap   &operator+=(difference_type n) { it =+ n; return (*this); }
+            iterator_wrap   &operator-=(difference_type n) { it -= n; return (*this); }
+            iterator_wrap   &operator+=(difference_type n) { it += n; return (*this); }
 
             reference       operator[](difference_type n) {return (it[n]);}
             iterator_type   base() const {return it;}

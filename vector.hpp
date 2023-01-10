@@ -13,6 +13,7 @@
 #include <iostream>
 #include <memory>
 #include "iterator.hpp"
+#include "type_trait.hpp"
 
 namespace ft{
     template <typename T, typename Alloc = std::allocator<T> >
@@ -23,10 +24,10 @@ namespace ft{
             typedef value_type& reference;
             typedef const value_type&   const_reference;
             typedef Alloc allocator_type;
-            typedef allocator_type::value_type* pointer;
-            typedef allocator_type::value_type const* const_pointer;
-            typedef allocator_type::size_type size_type;
-            typedef allocator_type::difference_type difference_type;
+            typedef typename allocator_type::value_type* pointer;
+            typedef typename allocator_type::value_type const* const_pointer;
+            typedef typename allocator_type::size_type size_type;
+            typedef typename allocator_type::difference_type difference_type;
             typedef typename ft::iterator_wrap<pointer> iterator;
             typedef typename ft::iterator_wrap<const_pointer> const_iterator;
             typedef ft::reverse_iterator<iterator>         reverse_iterator;
@@ -57,31 +58,41 @@ namespace ft{
                 arr = myAllocator.allocate(__capacity);
             }
 
-            vector(int n, int value)
+            vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
             {
                 __size = 0;
                 __capacity = n;
+                myAllocator = alloc;
                 arr = myAllocator.allocate(__capacity);
-                for (size_t i = 0; i < n; i++)
+                for (size_type i = 0; i < n; i++)
                 {
-                    arr[i] = value;
+                    arr[i] = val;
                     __size++;
                 }
             }
+
+            template <class InputIterator>
+            // vector (enable_if<!is_integral<InputIterator>::value, InputIterator>::type)
+            // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
+            vector (typename enable_if<!is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last, const allocator_type& alloc = allocator_type())
+            {
+                __size = 0;
+                __capacity = 0;
+                myAllocator = alloc;
+                for (InputIterator it = first; it != last; it++)
+                {
+                    this->push_back(*it);
+                }
+            }
+
             ~vector()
             {
                 if (__size != 0)
                     myAllocator.deallocate(arr, __capacity);
             }
+            // void assign( size_type n, const value_type& value )
 
-            void assign( size_type n, const value_type& value )
-            {
-                this->__size = 0;
-                for (size_type i = 0; i < n; i++)
-                {
-                    this->push_back(value);
-                }
-            }
+
             template< class InputIt >
             void assign( InputIt first, InputIt last );
 
@@ -194,9 +205,65 @@ namespace ft{
                 __capacity = 0;
             }
 
-            void insert (iterator position, size_type n, const value_type& x)
-            {
+            // void insert (iterator position, size_type n, const value_type& x)
+            // {
                 
+            // }
+            iterator insert( iterator pos, const T& value )
+            {
+                size_type tmp_capacity = __capacity;
+                int i = 0;
+
+                if (__size == __capacity)
+                    __capacity *= 2;
+                pointer tmp = myAllocator.allocate(__capacity);
+
+                iterator it = begin();
+
+                for (; it != pos; it++) { tmp[i] = *it; i++;}
+
+                tmp[i] = value;
+
+                for (; it != end(); it++) 
+                {
+                    i++;
+                    tmp[i] = *it;
+                }
+
+                __size++;
+                myAllocator.deallocate(arr, tmp_capacity);
+                arr = tmp;
+                return (begin());
+            }
+
+            void insert (iterator position, size_type n, const value_type& val)
+            {
+                size_type tmp_capacity = __capacity;
+                int i = 0;
+
+                while (__size + n >= __capacity)
+                    __capacity *= 2;
+                pointer tmp = myAllocator.allocate(__capacity);
+
+                iterator it = begin();
+
+                for (; it != position; it++) { tmp[i] = *it; i++;}
+
+                for (size_type j = 0; j < n; j++)
+                {
+                    tmp[i] = val;
+                    i++;
+                }
+
+                for (; it != end(); it++) 
+                {
+                    tmp[i] = *it;
+                    i++;
+                }
+
+                __size += n;
+                myAllocator.deallocate(arr, tmp_capacity);
+                arr = tmp;
             }
 
             void push_back (const value_type& val)
@@ -240,7 +307,18 @@ namespace ft{
 
             //add copy asign and destuctor;
 
-
+    private:
+        template <class InputIterator>
+            size_type iter_count (InputIterator first, InputIterator last)
+            {
+                size_type count = 0;
+                while (first != last)
+                {
+                    count++;
+                    first++;
+                }
+                return (count);
+            }
 
     };
 

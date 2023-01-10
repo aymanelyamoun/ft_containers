@@ -1,3 +1,4 @@
+
 template <class _Tp> struct remove_const { typedef _Tp type; };
 template <class _Tp> struct remove_const<const _Tp> { typedef _Tp type; };
 
@@ -13,7 +14,7 @@ struct enable_if<true, T> { typedef T type; };
 template <class _Tp, _Tp __v>
 struct integral_constant
 {
-    static _LIBCPP_CONSTEXPR const _Tp      value = __v;
+    static const _Tp      value = __v;
     typedef _Tp               value_type;
     typedef integral_constant type;
     operator value_type() const {return value;}
@@ -41,4 +42,4 @@ template<> struct is_integral_filter<long long> : public true_type {};
 template<> struct is_integral_filter<unsigned long long> : public true_type {};
 
 template <class _Tp>
-struct is_integral : is_integral_filter<typename rmove_volatile<typename remove_const<_Tp>::type>::type> {};
+struct is_integral : is_integral_filter<typename remove_volatile<typename remove_const<_Tp>::type>::type> {};
