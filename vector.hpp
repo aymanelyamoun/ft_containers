@@ -299,6 +299,31 @@ namespace ft{
                 arr = tmp;
             }
 
+            iterator erase (iterator position)
+            {
+                iterator it = begin(); 
+            
+                for (; it != position; it++);
+
+                for (; it != end(); it++)
+                    *it = *(it + 1);
+                __size--;
+                return (position);
+            }
+
+            iterator erase (iterator first, iterator last)
+            {
+                iterator it = begin(); 
+                int dis = ft::distance(first, last);
+            
+                for (; it != first; it++);
+
+                for (; it != end(); it++)
+                    *it = *(it + dis);
+                __size -= dis;
+                return (first);
+            }
+
             void push_back (const value_type& val)
             {
                 pointer tmp_arr;
