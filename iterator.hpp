@@ -132,9 +132,20 @@ namespace ft{
         reference operator[](difference_type n) const { return *(*this + n);}
 
     };
+
+    template<class InputIterator>
+    typename iterator_traits<InputIterator>::difference_type
+    distance (InputIterator first, InputIterator last)
+    {
+        typename iterator_traits<InputIterator>::difference_type n = 0;
+        while (first != last)
+        {
+            ++first;
+            ++n;
+        }
+        return n;
+    }
 }
-
-
 
 
 

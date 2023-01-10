@@ -266,6 +266,39 @@ namespace ft{
                 arr = tmp;
             }
 
+            template <class InputIterator>
+            void insert (iterator position, typename enable_if<!is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
+            {
+                size_type tmp_capacity = __capacity;
+                int i = 0;
+                int dis = ft::distance(first, last);
+
+                if (__capacity == 0)
+                        __capacity = 1;
+                while (__size + dis >= __capacity)
+                    __capacity *= 2;
+                pointer tmp = myAllocator.allocate(__capacity);
+
+                iterator it = begin();
+
+                for (; it != position; it++) { tmp[i] = *it; i++;}
+
+                for (; first != last; first++)
+                {
+                    tmp[i] = *first;
+                    i++;
+                }
+                for (; it != end(); it++) 
+                {
+                    tmp[i] = *it;
+                    i++;
+                }
+
+                __size += dis;
+                myAllocator.deallocate(arr, tmp_capacity);
+                arr = tmp;
+            }
+
             void push_back (const value_type& val)
             {
                 pointer tmp_arr;
