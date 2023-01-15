@@ -42,4 +42,4 @@ template<> struct is_integral_filter<long long> : public true_type {};
 template<> struct is_integral_filter<unsigned long long> : public true_type {};
 
 template <class _Tp>
-struct is_integral : is_integral_filter<typename remove_volatile<typename remove_const<_Tp>::type>::type> {};
+struct is_integral : public is_integral_filter<typename remove_volatile<typename remove_const<_Tp>::type>::type> {};

@@ -90,6 +90,20 @@ namespace ft{
                 if (__size != 0)
                     myAllocator.deallocate(arr, __capacity);
             }
+
+            vector& operator= (const vector& x)
+            {
+                if (this != &x)
+                {
+                    this->clear();
+                    this->reserve(x.capacity());
+                    for (size_type i = 0; i < x.size(); i++)
+                    {
+                        this->push_back(x[i]);
+                    }
+                }
+                return (*this);
+            }
             // void assign( size_type n, const value_type& value )
 
 
@@ -354,8 +368,70 @@ namespace ft{
 
             void pop_back()
             {
-                if (__size > 0)
+                if (~value_type(arr[__size - 1]))
                     __size--;
+                // if (__size > 0)
+                    // __size--;
+            }
+
+            // void resize (size_type n, value_type val = value_type())
+            // {
+            //     if (__size < n)
+            //     {
+            //         while (__size < n)
+            //             push_back(val);
+            //     }
+            //     else if (__size > n)
+            //     {
+            //         while (__size > n)
+            //             pop_back();
+            //     }
+            // }
+            
+            // void resize (size_type n, value_type val = value_type())
+            // {
+            //     size_type tmp_capacity = __capacity;
+            //     size_type old_size = __size;
+            //     pointer tmp;
+
+            //     __capacity = n;
+            //     __size = n;
+            //     if (old_size < n)
+            //     {
+            //         tmp = myAllocator.allocate(n);
+
+            //         for (size_type i = 0; i < old_size; i++)
+            //             tmp[i] = value_type(arr[i]);
+            //         for (size_type i = old_size; i < n; i++)
+            //             tmp[i] = val;
+            //         arr = tmp;
+            //     }
+            //     else if (old_size > n)
+            //     {
+            //         // std::cout << "old_size > n" << std::endl;
+            //         tmp = myAllocator.allocate(__capacity);
+            //         for (size_t i = 0; i < __size; i++)
+            //             tmp[i] = value_type(arr[i]);
+            //         if (tmp_capacity > 0)
+            //             myAllocator.deallocate(arr, tmp_capacity);
+            //         arr = tmp;
+            //     }
+            //     // std::cout << "size: " << __size << std::endl;
+            // }
+
+            void swap (vector& x)
+            {
+                pointer tmp_arr = arr;
+                size_type tmp_size = __size;
+                size_type tmp_capacity = __capacity;
+
+                arr = x.arr;
+                __size = x.__size;
+                __capacity = x.__capacity;
+
+                x.arr = tmp_arr;
+                x.__size = tmp_size;
+                x.__capacity = tmp_capacity;
             }
 
         // // // // // // // //
@@ -379,7 +455,68 @@ namespace ft{
             }
 
     };
+    // // // // // // // //
+    // operator start
+    // // // // // // // //
+    template< class T, class Alloc >
+    bool operator==( const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs )
+    {
+        if (lhs.size() != rhs.size())
+            return (false);
+        for (size_t i = 0; i < lhs.size(); i++)
+        {
+            if (lhs[i] != rhs[i])
+                return (false);
+        }
+        return (true);
+    }
 
+    template< class T, class Alloc >
+    bool operator!=( const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs )
+    {
+        if (lhs.size() == rhs.size())
+            return (false);
+        for (size_t i = 0; i < lhs.size(); i++)
+        {
+            if (lhs[i] == rhs[i])
+                return (false);
+        }
+        return (true);
+    }
+
+    template< class T, class Alloc >
+    bool operator<( const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs)
+    {
+        if (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()))
+            return (true);
+        return (false);
+    }
+
+
+    template< class T, class Alloc >
+    bool operator>( const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs)
+    {
+        if (ft::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end()))
+            return (true);
+        return (false);
+    }
+
+    template< class T, class Alloc >
+    bool operator<=( const std::vector<T,Alloc>& lhs,
+                 const std::vector<T,Alloc>& rhs )
+    {
+        return (!(lhs > rhs));
+    }
+
+    template< class T, class Alloc >
+    bool operator>=( const std::vector<T,Alloc>& lhs,
+                 const std::vector<T,Alloc>& rhs )
+    {
+        return (!(lhs < rhs));
+    }
+    // // // // // // // //
+    // operator end
+    // // // // // // // //
 }
 
 
