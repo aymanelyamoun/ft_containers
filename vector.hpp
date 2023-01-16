@@ -14,6 +14,7 @@
 #include <memory>
 #include "iterator.hpp"
 #include "type_trait.hpp"
+#include "equality.hpp"
 
 namespace ft{
     template <typename T, typename Alloc = std::allocator<T> >
@@ -195,9 +196,13 @@ namespace ft{
                     __capacity = new_cap;
                     tmp_arr = myAllocator.allocate(__capacity);
                     for (size_t i = 0; i < __size; i++)
-                        tmp_arr[i] = value_type(arr[i]);
+                        myAllocator.construct(&tmp_arr[i], arr[i]);
                     if (__size != 0)
+                    {
+                        for (size_t i = 0; i < __size; i++)
+                            myAllocator.destroy(&arr[i]);
                         myAllocator.deallocate(arr, amount_to_free);
+                    }
                     arr = tmp_arr; 
                 }
             }
@@ -214,7 +219,11 @@ namespace ft{
             void clear()
             {
                 if (__size != 0)
+                {
+                    for (size_type i = 0; i < __size; i++)
+                        myAllocator.destroy(&arr[i]);
                     myAllocator.deallocate(arr, __capacity);
+                }
                 __size = 0;
                 __capacity = 0;
             }
@@ -234,14 +243,15 @@ namespace ft{
 
                 iterator it = begin();
 
-                for (; it != pos; it++) { tmp[i] = *it; i++;}
+                for (; it != pos; it++) { myAllocator.construct(&tmp[i], *it); i++;}
 
-                tmp[i] = value;
+                myAllocator.construct(&tmp[i], value);
 
                 for (; it != end(); it++) 
                 {
                     i++;
-                    tmp[i] = *it;
+                    myAllocator.construct(&tmp[i], *it);
+                    // tmp[i] = *it;
                 }
 
                 __size++;
@@ -261,20 +271,22 @@ namespace ft{
 
                 iterator it = begin();
 
-                for (; it != position; it++) { tmp[i] = *it; i++;}
+                for (; it != position; it++) { myAllocator.construct(&tmp[i], *it); i++;}
 
                 for (size_type j = 0; j < n; j++)
                 {
-                    tmp[i] = val;
+                    myAllocator.construct(&tmp[i], val);
                     i++;
                 }
 
                 for (; it != end(); it++) 
                 {
-                    tmp[i] = *it;
+                    myAllocator.construct(&tmp[i], *it);
                     i++;
                 }
 
+                for (size_type j = 0; j < __size; j++)
+                    myAllocator.destroy(&arr[j]);
                 __size += n;
                 myAllocator.deallocate(arr, tmp_capacity);
                 arr = tmp;
@@ -295,19 +307,22 @@ namespace ft{
 
                 iterator it = begin();
 
-                for (; it != position; it++) { tmp[i] = *it; i++;}
+                for (; it != position; it++) { myAllocator.construct(&tmp[i], *it); i++;}
 
                 for (; first != last; first++)
                 {
-                    tmp[i] = *first;
+                    myAllocator.construct(&tmp[i], *first);
                     i++;
                 }
                 for (; it != end(); it++) 
                 {
-                    tmp[i] = *it;
+                    myAllocator.construct(&tmp[i], *it);
+                    // tmp[i] = *it;
                     i++;
                 }
 
+                for (size_type i = 0; i < __size; i++)
+                    myAllocator.destroy(&arr[i]);
                 __size += dis;
                 myAllocator.deallocate(arr, tmp_capacity);
                 arr = tmp;
@@ -345,7 +360,7 @@ namespace ft{
 
                 if (__size < __capacity)
                 {
-                    arr[__size] = val;
+                    myAllocator.construct(&arr[__size], val);
                     __size++;
                 }
                 else
@@ -357,36 +372,43 @@ namespace ft{
                         __capacity = 1;
                     tmp_arr = myAllocator.allocate(__capacity);
                     for (size_t i = 0; i < __size; i++)
-                        tmp_arr[i] = value_type(arr[i]);
+                        myAllocator.construct(&tmp_arr[i], arr[i]);
                     if (__size != 0)
+                    {
+                        for (size_t i = 0; i < __size; i++)
+                            myAllocator.destroy(&arr[i]);
                         myAllocator.deallocate(arr, amount_to_free);
+                    }
                     arr = tmp_arr;
-                    arr[__size] = val;
+                    myAllocator.construct(&arr[__size], val);
                     __size++;
                 }
             }
 
             void pop_back()
             {
-                if (~value_type(arr[__size - 1]))
+                // if (~value_type(arr[__size - 1]))
+                //     __size--;
+                if (__size > 0)
+                {
+                    myAllocator.destroy(&arr[__size - 1]);
                     __size--;
-                // if (__size > 0)
-                    // __size--;
+                }
             }
 
-            // void resize (size_type n, value_type val = value_type())
-            // {
-            //     if (__size < n)
-            //     {
-            //         while (__size < n)
-            //             push_back(val);
-            //     }
-            //     else if (__size > n)
-            //     {
-            //         while (__size > n)
-            //             pop_back();
-            //     }
-            // }
+            void resize (size_type n, value_type val = value_type())
+            {
+                if (__size < n)
+                {
+                    while (__size < n)
+                        push_back(val);
+                }
+                else if (__size > n)
+                {
+                    while (__size > n)
+                        pop_back();
+                }
+            }
             
             // void resize (size_type n, value_type val = value_type())
             // {
@@ -455,6 +477,12 @@ namespace ft{
             }
 
     };
+
+    template< class T, class Alloc >
+    void swap( std::vector<T,Alloc>& lhs,
+           std::vector<T,Alloc>& rhs )
+    { lhs.swap(rhs); }
+
     // // // // // // // //
     // operator start
     // // // // // // // //
