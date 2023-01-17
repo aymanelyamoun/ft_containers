@@ -2,18 +2,36 @@
 #include <iterator>
 #include <iostream>
 #include "vector.hpp"
+#include <stack>
+
+class A
+{
+public:
+  int a;
+  A(): a(100) {; std::cout << "A::A()" << std::endl; }
+  A(const A&) { std::cout << "A::A(const A&)" << std::endl; }
+  ~A() { std::cout << "A::~A()" << std::endl; }
+};
 
 int main ()
 {
-  ft::vector<int> myvector;
-  // ft::vector<A> myvector;
+  std::vector<int> myvector;
+  // std::allocator<A> alloc;
+  // // ft::vector<A> myvector;
+
+  //   A* p = alloc.allocate(5);
+  //   alloc.construct(p, A());
+  //   A* pp = alloc.allocate(5);
+  //   pp[0] = p[0];
+  //   std::cout << pp[0].a << std::endl;
 
   // set some initial content:
-  // for (int i=1;i<10;i++) myvector.push_back(A());
+  for (int i=1;i<10;i++) myvector.push_back(i);
 
-  // myvector.resize(0);
-  // myvector.resize(8, 100);
-  // myvector.resize(12);
+  myvector.resize(0);
+  myvector.resize(12);
+  myvector.resize(8, 100);
+  std::cout << "myvector capacity :" << myvector.capacity() << std::endl;
 
   std::cout << "myvector contains:";
   std::cout << myvector.size() << std::endl;
