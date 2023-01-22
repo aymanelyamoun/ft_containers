@@ -3,6 +3,7 @@
 #include <iostream>
 #include "vector.hpp"
 #include <stack>
+#include <map>
 
 class A
 {
