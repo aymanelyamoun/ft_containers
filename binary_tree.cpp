@@ -82,6 +82,7 @@ struct tree_node
             return 0;
         return height(N->left) - height(N->right);
     }
+
     tree_node *add_node(tree_node *root, int key)
     {
         if (root == NULL)
