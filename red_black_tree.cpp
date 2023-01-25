@@ -19,12 +19,6 @@ struct RBTree
         bool color;
 
         Node(int data, RBTree tree): data(data), right(tree.nil), left(tree.nil), parent(tree.nil), color(RED){}
-        // Node(int data, RBTree *tree): data(data), color(RED)
-        // {
-        //     right = tree->nil;
-        //     left = tree->nil;
-        //     parent = tree->nil;
-        // }
 
         Node(bool color): color(color), right(NULL), left(NULL), parent(NULL) {}
         void recolor() { color = !color;}
@@ -80,7 +74,7 @@ struct RBTree
         return (tmp);
     }
 
-    int rotate_r(Node *node)
+    int get_rotate_direction_r(Node *node)
     {
         // if (node->parent != this->nil)
         if (node->left != this->nil && node->left->color == RED)
@@ -110,7 +104,7 @@ struct RBTree
     //     return (tmp);
     // }
 
-    int rotate_l(Node *node)
+    int get_rotate_direction_l(Node *node)
     {
         // if (node->parent != this->nil)
         Node *tmp;
@@ -133,7 +127,7 @@ struct RBTree
             recolor(node);
         }
         else
-            return (rotate_r(node));
+            return (get_rotate_direction_r(node));
         return (0);
     }
 
@@ -145,7 +139,7 @@ struct RBTree
             recolor(node);
         }
         else
-            return (rotate_l(node));
+            return (get_rotate_direction_l(node));
         return (0);
         // return (node);
     }
@@ -218,11 +212,6 @@ struct RBTree
                 return (do_left_rotate(root, rotate));
         }
         return root;
-        // if (root == this->root)
-        // {
-        //     if (root->color == RED)
-        //         root->recolor();
-        // }
     }
     void insert(int data)
     {
@@ -237,6 +226,63 @@ struct RBTree
             // std::cout << "+++=j=+++\n";
             this->root = insert_util(this->root, data, 0);
         }
+    }
+
+    Node *find_min(Node *root)
+    {
+        if (root->left == this->nil)
+            return root;
+        return (find_min(root->left));
+    }
+
+    Node *delete_node_util(Node *root)
+    {
+        Node *tmp;
+
+        if (root->right == this->nil && root->left == this->nil)
+        {
+            delete root;
+            root = this->nil;
+        }
+        else if (root->right != this->nil && root->left == this->nil)
+        {
+            tmp = root->right;
+            delete root;
+            root = tmp;
+        }
+        else if (root->right == this->nil && root->left != this->nil)
+        {
+            tmp = root->left;
+            delete root;
+            root = tmp;
+        }
+        else
+        {
+            tmp = find_min(root->right);
+            root->data = tmp->data;
+            root->right = delete_node(root->right, tmp->data);
+        }
+        return (root);
+    }
+
+    Node *delete_node(Node *root, int data)
+    {
+        if (root == this->nil)
+            return (this->nil);
+        if (data == root->data)
+        {
+            return delete_node_util(root);
+        }
+        else if (data < root->data)
+            root->left = delete_node(root->left, data);
+        else if (data > root->data)
+            root->right = delete_node(root->right, data);
+        return root;
+    }
+
+    void delete_(int data)
+    {
+        this->root = delete_node(this->root, data);
     }
 
     void inorderTraversalHelper(Node *node)
@@ -266,7 +312,11 @@ struct RBTree
             {
                 std::cout << " "; 
             } 
-            std::cout << root->data; 
+            std::cout << root->data;
+            if (root->color == RED)
+                std::cout << 'r';
+            else
+                std::cout << 'b';
             std::cout << std::endl; 
             printTreeHelper(root->left, space); 
         }
@@ -277,20 +327,37 @@ struct RBTree
     }
 
 };
-
+// #include <set>
     int main() 
     {
         RBTree t;
-        int arr[] = {1,4,6,3,5,7,8,2,9};
-        for(int i=0;i<9;i++)
+        // std::set<int> hop;
+        int input;
+        long long i = 0;
+        // int arr[] = {1,4,6,3,5,7,8,2,9};
+        while(1)
         {
-            t.insert(arr[i]);
-            std::cout << std::endl;
-            t.inorderTraversal();
+            std::cin >> input;
+            // hop.insert(i);
+            if (input == 1)
+            {
+                std::cin >> input;
+                t.insert(input);
+            }
+            else if (2)
+            {
+                std::cin >> input;
+                t.delete_(input);
+            }
+            // if (t.root == t.nil)
+            //     break;
+            // std::cout << std::endl;
+            // t.inorderTraversal();
+            i++;
+            t.printTree();
             // std::cout << arr[i] <<"++000++\n";
         }
         // you can check colour of any node by with its attribute node.colour
-        t.printTree();
     }
 
 // int main()
