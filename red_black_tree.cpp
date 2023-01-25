@@ -2,6 +2,8 @@
 #define RED true
 #define BLACK false
 
+enum {LEFT = 1, RIGHT};
+
 struct RBTree;
 
 
@@ -31,7 +33,7 @@ struct RBTree
         {
             if (node == NULL)
                 return tree.nil;
-            if (node->parent != tree.nil)
+            if (node->parent == tree.nil)
                 return tree.nil;
             if (node->parent->left == node)
                 return node->parent->right;
@@ -78,87 +80,142 @@ struct RBTree
         return (tmp);
     }
 
-    Node *rotate_r(Node *node)
+    int rotate_r(Node *node)
     {
         // if (node->parent != this->nil)
-        Node *tmp;
         if (node->left != this->nil && node->left->color == RED)
-        {
-            node->parent->right = right_rotate(node);
-            tmp = left_rotate(node->parent);
-            tmp->recolor();
-            tmp->left->recolor();
-        }
+            return (LEFT);
         else if (node->right != this->nil && node->right->color == RED)
-        {
-            tmp = left_rotate(node->parent);
-            tmp->recolor();
-            tmp->left->recolor();
-        }
-        return (tmp);
+            return (RIGHT);
+        return (0);
     }
 
-    Node *rotate_l(Node *node)
+    // int rotate_r(Node *node)
+    // {
+    //     // if (node->parent != this->nil)
+    //     Node *tmp;
+    //     if (node->left != this->nil && node->left->color == RED)
+    //     {
+    //         node->parent->right = right_rotate(node);
+    //         tmp = left_rotate(node->parent);
+    //         tmp->recolor();
+    //         tmp->left->recolor();
+    //     }
+    //     else if (node->right != this->nil && node->right->color == RED)
+    //     {
+    //         tmp = left_rotate(node->parent);
+    //         tmp->recolor();
+    //         tmp->left->recolor();
+    //     }
+    //     return (tmp);
+    // }
+
+    int rotate_l(Node *node)
     {
         // if (node->parent != this->nil)
         Node *tmp;
         if (node->right != this->nil && node->right->color == RED)
         {
-            node->parent->right = left_rotate(node);
-            tmp = right_rotate(node->parent);
-            tmp->recolor();
-            tmp->right->recolor();
+            return (RIGHT);
         }
         else if (node->left != this->nil && node->left->color == RED)
         {
-            tmp = left_rotate(node->parent);
+            return (LEFT);
+        }
+        return (0);
+    }
+
+    int fix_tree_r(Node *node)
+    {
+        // std::cout << "+++=M=+++\n";
+        if (node->get_sibling(*this, node)->color == RED)
+        {
+            recolor(node);
+        }
+        else
+            return (rotate_r(node));
+        return (0);
+    }
+
+    int fix_tree_l(Node *node)
+    {
+        // std::cout << "+++=-=+++\n";
+        if (node->get_sibling(*this, node)->color == RED)
+        {
+            recolor(node);
+        }
+        else
+            return (rotate_l(node));
+        return (0);
+        // return (node);
+    }
+
+    Node *do_right_rotate(Node *root, int rotation)
+    {
+        Node *tmp;
+
+        if (rotation == LEFT)
+        {
+            root->right = right_rotate(root->right);
+            tmp = left_rotate(root);
             tmp->recolor();
-            tmp->right->recolor();
+            tmp->left->recolor();
+        }
+        else if (rotation == RIGHT)
+        {
+            tmp = left_rotate(root);   
+            tmp->recolor();
+            tmp->left->recolor();
         }
         return (tmp);
     }
 
-    Node *fix_tree_r(Node *node)
+    Node *do_left_rotate(Node *root, int rotation)
     {
-        std::cout << "+++==+++\n";
-        if (node->get_sibling(*this, node)->color == RED)
-            recolor(node);
-        else
-            return (rotate_r(node));
-        return (node);
+        Node *tmp;
+        if (rotation == RIGHT)
+        {
+            root->left = left_rotate(root->left);
+            tmp = right_rotate(root);
+            root->recolor();
+            root->right->recolor();
+        }
+        else if(rotation == LEFT)
+        {
+            tmp = right_rotate(root);
+            root->recolor();
+            root->right->recolor();
+        }
+        return (tmp);
     }
 
-    Node *fix_tree_l(Node *node)
+    Node *insert_util(Node *root, int data, int *rotation)
     {
-        std::cout << "+++=-=+++\n";
-        if (node->get_sibling(*this, node)->color == RED)
-            recolor(node);
-        else
-            return (rotate_l(node));
-        return (node);
-    }
+        int rotate = 0;
 
-    Node *insert_util(Node *root, int data)
-    {
-        if (root == NULL)
+        if (root == this->nil)
         {
             return (new Node(data, *this));
         }
         if (data > root->data)
         {
             // std::cout << "+++++\n";
-            root->right = insert_util(root->right, data);
+            root->right = insert_util(root->right, data, &rotate);
             root->right->parent = root;
             if (root->color == RED && root->right->color == RED)
-                return (fix_tree_r(root));
+                *rotation = fix_tree_r(root);
+            if (rotate)
+                return (do_right_rotate(root, rotate));
         }
         if (data < root->data)
         {
-            std::cout << "+++-+++\n";
-            root->left = insert_util(root->left, data);
+            // std::cout << "+++-+++\n";
+            root->left = insert_util(root->left, data, &rotate);
             root->left->parent = root;
             if (root->color == RED && root->left->color == RED)
-                return (fix_tree_l(root));
+                *rotation = fix_tree_l(root);
+            if (rotate)
+                return (do_left_rotate(root, rotate));
         }
         return root;
         // if (root == this->root)
@@ -172,13 +229,13 @@ struct RBTree
         if (this->root == this->nil)
         {
             // std::cout << "+++=-=+++\n";
-            this->root = insert_util(NULL, data);
+            this->root = insert_util(root, data, 0);
             this->root->recolor();
         }
         else
         {
             // std::cout << "+++=j=+++\n";
-            this->root = insert_util(this->root, data);
+            this->root = insert_util(this->root, data, 0);
         }
     }
 
@@ -197,6 +254,27 @@ struct RBTree
         inorderTraversalHelper(this->root);
     }
 
+    void printTreeHelper(Node *root, int space)
+    {
+        int i;
+        if(root != this->nil)
+        {
+            space = space + 10;
+            printTreeHelper(root->right, space); 
+            std::cout << std::endl; 
+            for ( i = 10; i < space; i++) 
+            {
+                std::cout << " "; 
+            } 
+            std::cout << root->data; 
+            std::cout << std::endl; 
+            printTreeHelper(root->left, space); 
+        }
+    }
+    void printTree()
+    {
+        printTreeHelper(this->root, 0);
+    }
 
 };
 
@@ -209,10 +287,10 @@ struct RBTree
             t.insert(arr[i]);
             std::cout << std::endl;
             t.inorderTraversal();
-            // std::cout << "++000++\n";
+            // std::cout << arr[i] <<"++000++\n";
         }
         // you can check colour of any node by with its attribute node.colour
-        // t.printTree();
+        t.printTree();
     }
 
 // int main()
@@ -229,3 +307,4 @@ struct RBTree
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// add LEFT and RIGHT to check the rotation in the parent
