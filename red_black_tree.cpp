@@ -22,6 +22,9 @@ struct RBTree
 
         Node(bool color): color(color), right(NULL), left(NULL), parent(NULL) {}
         void recolor() { color = !color;}
+        void be_black() {color = BLACK;}
+        void be_red() {color = RED;}
+        bool is_red(){return (color == RED);}
 
         Node *get_sibling(RBTree tree, Node *node)
         {
@@ -33,6 +36,14 @@ struct RBTree
                 return node->parent->right;
             else
                 return node->parent->left;
+        }
+        int has_red_child()
+        {
+            if (this->right->is_red())
+                return (RIGHT);
+            else if (this->left->is_red())
+                return (LEFT);
+            return (0);
         }
     };
     Node *nil;
@@ -235,48 +246,133 @@ struct RBTree
         return (find_min(root->left));
     }
 
-    Node *delete_node_util(Node *root)
+    Node *delete_red(Node *root, Node *child)
     {
-        Node *tmp;
-
-        if (root->right == this->nil && root->left == this->nil)
+        if (child == this->nil)
         {
             delete root;
             root = this->nil;
         }
-        else if (root->right != this->nil && root->left == this->nil)
+        else
         {
-            tmp = root->right;
+            child->parent = root->parent;
             delete root;
-            root = tmp;
+            root = child;
+            child->be_black();
         }
-        else if (root->right == this->nil && root->left != this->nil)
+        return (root);
+    }
+
+    Node *delete_black(Node *root, Node *child)
+    {
+        if (child == this->nil)
         {
-            tmp = root->left;
             delete root;
-            root = tmp;
+            root = this->nil;
         }
         else
         {
-            tmp = find_min(root->right);
-            root->data = tmp->data;
-            root->right = delete_node(root->right, tmp->data);
+            child->parent = root->parent;
+            delete root;
+            root = child;
+        }
+        return (root);
+    }
+
+    Node *delete_node_util(Node *root, bool *is_double_black)
+    {
+        // Node *tmp;
+        Node *next;
+        Node *sibling;
+
+        if (root->right == this->nil && root->left == this->nil)
+        {
+            if (root->color == RED)
+                root = delete_red(root, this->nil);
+            // delete root;
+            // root = this->nil;
+        }
+        else if (root->right != this->nil && root->left == this->nil)
+        {
+            // next = root->right;
+            // sibling = root->get_sibling(*this, root);
+
+            if (root->color == RED || root->right->color == RED)
+                root = delete_red(root, root->right);
+            else
+            {
+                root = delete_black(root, root->right);
+                *is_double_black = true;
+            }
+            // tmp = root->right;
+            // delete root;
+            // root = tmp;
+        }
+        else if (root->right == this->nil && root->left != this->nil)
+        {
+            if (root->color == RED || root->left->color == RED)
+                root = delete_red(root, root->left);
+            // tmp = root->left;
+            // delete root;
+            // root = tmp;
+        }
+        else
+        {
+            root->data = find_min(root->right)->data;
+            root->right = delete_node(root->right, root->data);
         }
         return (root);
     }
 
     Node *delete_node(Node *root, int data)
     {
+        bool is_double_black = false;
         if (root == this->nil)
             return (this->nil);
         if (data == root->data)
         {
-            return delete_node_util(root);
+            return delete_node_util(root, &is_double_black);
         }
         else if (data < root->data)
+        {
+            Node *tmp;
+
             root->left = delete_node(root->left, data);
+            if (is_double_black)
+            {
+                if (root->right == BLACK)
+                {
+                    if (root == this->root)
+                        return (root);
+                    if (root->right->has_red_child())
+                    {
+                        if (root->right->has_red_child() == LEFT)
+                        {
+                            root->right = right_rotate(root->right);
+                            tmp = left_rotate(root);
+                            // if sus make it make_black for root, left and right;
+                            tmp->recolor();
+                        }
+                        else
+                        {
+                            tmp = left_rotate(root);
+                            tmp->recolor();
+                        }
+                    }
+                    else
+                    {
+                        // root->right->recolor();
+                        // if (root->is_red() == false)
+
+                    }
+                }
+            }
+        }
         else if (data > root->data)
+        {
             root->right = delete_node(root->right, data);
+
+        }
         return root;
     }
 
