@@ -34,8 +34,8 @@ namespace ft{
             typedef ft::reverse_iterator<iterator>         reverse_iterator;
             typedef ft::reverse_iterator<const_iterator>   const_reverse_iterator;
         private:
-            size_t  __size;
-            size_t  __capacity;
+            size_type  __size;
+            size_type  __capacity;
             Alloc   myAllocator;
             pointer arr;
             iterator __begin;

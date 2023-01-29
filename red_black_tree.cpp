@@ -51,6 +51,15 @@ struct RBTree
 
     RBTree() {nil = new Node(BLACK); root = nil;}
 
+    int child_derection(Node *root)
+    {
+        if (root->parent != nil && root == root->parent->right)
+            return (RIGHT);
+        else if (root->parent != nil && root == root->parent->left)
+            return (LEFT);
+        return (0);
+    }
+
     void recolor(Node *root)
     {
         root->recolor();
@@ -289,6 +298,14 @@ struct RBTree
         {
             if (root->color == RED)
                 root = delete_red(root, this->nil);
+            else
+            {
+                sibling = root->get_sibling(*this, root);
+                std::cout << "+++-+++" << std::endl;
+                root = delete_black(root, root->right);
+                fix_double_black(root, sibling);
+                // *is_double_black = true;
+            }
             // delete root;
             // root = this->nil;
         }
@@ -296,13 +313,15 @@ struct RBTree
         {
             // next = root->right;
             // sibling = root->get_sibling(*this, root);
-
             if (root->color == RED || root->right->color == RED)
                 root = delete_red(root, root->right);
             else
             {
+                sibling = root->get_sibling(*this, root);
+                std::cout << "+++-+++" << std::endl;
                 root = delete_black(root, root->right);
-                *is_double_black = true;
+                fix_double_black(root, sibling);
+                // *is_double_black = true;
             }
             // tmp = root->right;
             // delete root;
@@ -312,16 +331,168 @@ struct RBTree
         {
             if (root->color == RED || root->left->color == RED)
                 root = delete_red(root, root->left);
+            else
+            {
+                std::cout << "+++++++" << std::endl;
+                root = delete_black(root, root->left);
+                *is_double_black = true;
+            }
             // tmp = root->left;
             // delete root;
             // root = tmp;
         }
         else
         {
+            std::cout << "+++-+++" << std::endl;
             root->data = find_min(root->right)->data;
             root->right = delete_node(root->right, root->data);
         }
         return (root);
+    }
+
+    Node *fix_double_black(Node *d_black, Node *sibling)
+    {
+        if (d_black == this->root)
+            return d_black;
+        if (/*sibling != this->nil &&*/ child_derection(sibling) == RIGHT)
+        {
+            return (fix_double_black_l(sibling->parent));
+        }
+        else if (/*sibling != this->nil &&*/ child_derection(sibling) == LEFT)
+        {
+            return (fix_double_black_r(sibling->parent));
+        }
+        return d_black;
+    }
+
+    Node *fix_double_black_l(Node *root)
+    {
+        Node *tmp;
+
+        if (root->right == BLACK)
+        {
+            if (root->right->has_red_child())
+            {
+                if (root->right->has_red_child() == LEFT)
+                {
+                    root->right = right_rotate(root->right);
+                    tmp = left_rotate(root);
+                    // if sus make it make_black for root, left and right;
+                    tmp->recolor();
+                }
+                else
+                {
+                    tmp = left_rotate(root);
+                    tmp->recolor();
+                }
+                return tmp;
+            }
+            else
+            {
+                root->right->recolor();
+                if (root->is_red() == false)
+                    return (fix_double_black(root, root->get_sibling(*this, root)));
+                else
+                {
+                    root->be_black();
+                    return (root);
+                }
+
+            }
+        }
+        else
+        {
+            //save the double black child
+            tmp = root->left;
+            if (root == this->root)
+                this->root = left_rotate(root);
+            else
+            {
+                if (child_derection(root->parent) == RIGHT)
+                {
+                    root->parent->right = left_rotate(root);
+                    root->parent->right->recolor();
+                    root->left->recolor();
+                    
+                }
+                if (child_derection(root->parent) == LEFT)
+                {
+                    root->parent->left = left_rotate(root);
+                    root->parent->left->recolor();
+                    root->left->recolor();
+                }
+                if (child_derection(tmp) == RIGHT)
+                    tmp->parent->right = fix_double_black(tmp, tmp->get_sibling(*this, tmp));
+                if (child_derection(tmp) == LEFT)
+                    tmp->parent->left = fix_double_black(tmp, tmp->get_sibling(*this, tmp));
+            }
+        }
+        return root;
+    }
+    Node *fix_double_black_r(Node *root)
+    {
+        Node *tmp;
+
+        if (root->left == BLACK)
+        {
+            if (root->left->has_red_child())
+            {
+                if (root->left->has_red_child() == RIGHT)
+                {
+                    root->left = left_rotate(root->left);
+                    tmp = right_rotate(root);
+                    // if sus make it make_black for root, left and right;
+                    tmp->recolor();
+                }
+                else
+                {
+                    tmp = right_rotate(root);
+                    tmp->recolor();
+                }
+                return tmp;
+            }
+            else
+            {
+                root->left->recolor();
+                if (root->is_red() == false)
+                    return (fix_double_black(root, root->get_sibling(*this, root)));
+                else
+                {
+                    root->be_black();
+                    return (root);
+                }
+
+            }
+        }
+        else
+        {
+            //save the double black child
+            tmp = root->right;
+            if (root == this->root)
+                this->root = right_rotate(root);
+            else
+            {
+                if (child_derection(root->parent) == RIGHT)
+                {
+                    root->parent->right = right_rotate(root);
+                    root->parent->right->recolor();
+                    root->right->recolor();
+                    
+                }
+                if (child_derection(root->parent) == LEFT)
+                {
+                    root->parent->right = right_rotate(root);
+                    root->parent->right->recolor();
+                    root->right->recolor();
+                }
+                if (child_derection(tmp) == RIGHT)
+                    tmp->parent->left = fix_double_black(tmp, tmp->get_sibling(*this, tmp));
+                if (child_derection(tmp) == LEFT)
+                    tmp->parent->right = fix_double_black(tmp, tmp->get_sibling(*this, tmp));
+        // return root;
+            }
+        }
+        return root;
     }
 
     Node *delete_node(Node *root, int data)
@@ -331,47 +502,24 @@ struct RBTree
             return (this->nil);
         if (data == root->data)
         {
+            std::cout << "+++==+++" << std::endl;
             return delete_node_util(root, &is_double_black);
         }
         else if (data < root->data)
         {
-            Node *tmp;
-
             root->left = delete_node(root->left, data);
             if (is_double_black)
             {
-                if (root->right == BLACK)
-                {
-                    if (root == this->root)
-                        return (root);
-                    if (root->right->has_red_child())
-                    {
-                        if (root->right->has_red_child() == LEFT)
-                        {
-                            root->right = right_rotate(root->right);
-                            tmp = left_rotate(root);
-                            // if sus make it make_black for root, left and right;
-                            tmp->recolor();
-                        }
-                        else
-                        {
-                            tmp = left_rotate(root);
-                            tmp->recolor();
-                        }
-                    }
-                    else
-                    {
-                        // root->right->recolor();
-                        // if (root->is_red() == false)
-
-                    }
-                }
+                root = fix_double_black(root->left, root->left->get_sibling(*this, root->left));
             }
         }
         else if (data > root->data)
         {
             root->right = delete_node(root->right, data);
-
+            if (is_double_black)
+            {
+                root = fix_double_black(root->right, root->right->get_sibling(*this, root->right));
+            }
         }
         return root;
     }
