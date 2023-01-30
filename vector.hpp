@@ -330,6 +330,7 @@ namespace ft{
 
             iterator erase (iterator position)
             {
+                //you may want to give the it initial value the value of position
                 iterator it = begin(); 
             
                 for (; it != position; it++);
