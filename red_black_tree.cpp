@@ -75,6 +75,18 @@ struct RBTree
             return node->parent->left;
     }
 
+    Node *new_sibling(Node *parent, Node *node)
+    {
+        if (node == NULL)
+            return this->nil;
+        if (parent == this->nil)
+            return this->nil;
+        if (parent->left == node)
+            return parent->right;
+        else
+            return parent->left;
+    }
+
     int db_derction(Node *sibling)
     {
         if (child_derection(sibling) == LEFT)
@@ -128,6 +140,201 @@ struct RBTree
             return (RIGHT);
         return (0);
     }
+
+    void transplant(Node *node, Node *add)
+    {
+        if (node->parent == this->nil)
+            this->root = add;
+        if (node->parent->left == node)
+            node->parent->left = add;
+        if (node->parent->right == node)
+            node->parent->right = add; 
+        add->parent = node->parent;
+    }
+
+    void link_to_tree(Node *root, Node *node)
+    {
+        if (root->parent != this->nil)
+        {
+            if (child_derection(root) == LEFT)
+                root->parent->left = node;
+            if (child_derection(root) == RIGHT)
+                root->parent->right = node;
+        }
+    }
+
+    void rb_left_rotate(Node *root)
+    {
+        Node *tmp = root->right;
+        Node *tmp2 = tmp->left;
+
+        tmp->left = root;
+        root->right = tmp2;
+        if (root == this->root)
+            this->root = tmp;
+        tmp->parent = root->parent;
+        link_to_tree(root, tmp);
+        root->parent = tmp;
+    }
+
+    void rb_right_rotate(Node *root)
+    {
+        Node *tmp = root->left;//
+        Node *tmp2 = tmp->right;
+
+        tmp->right = root;
+        root->left = tmp2;//
+        if (root == this->root)
+            this->root = tmp;
+        tmp->parent = root->parent;
+        link_to_tree(root, tmp);
+        root->parent = tmp;
+    }
+
+    void fix_db(Node *parent, Node *db, Node *sibling)
+    {
+        Node *tmp;
+
+        std::cout << "i need to be fixed\n";
+        if (db == this->root)
+            return ;
+        if (sibling == this->nil)
+            fix_db(parent->parent, parent, get_sibling(parent));
+        else if (sibling->is_black())
+        {
+            if (sibling->has_red_child())
+            {
+                std::cout << "i wanna be fixed 1\n";
+                if (child_derection(sibling) == RIGHT)
+                {
+                    if (sibling->has_red_child() == RIGHT || sibling->has_red_child() == BOTH)
+                    {
+                        sibling->right->be_black();
+                        sibling->color = parent->color;
+                        rb_left_rotate(parent);
+                    // std::cout << "----\n";
+                    }
+                    else
+                    {
+                        sibling->left->be_black();
+                        sibling->color = parent->color;
+                        rb_right_rotate(sibling);
+                        rb_left_rotate(parent);
+                        std::cout << "--+--\n";
+                    }
+                }
+                else if (child_derection(sibling) == LEFT)
+                {
+                    if (sibling->has_red_child() == LEFT || sibling->has_red_child() == BOTH)
+                    {
+                        std::cout << "+--+--\n";
+                        sibling->left->be_black();
+                        sibling->color = parent->color;
+                        rb_right_rotate(parent);
+                    }
+                    else
+                    {
+                        std::cout << "+--+--+\n";
+                        sibling->right->be_black();
+                        sibling->color = parent->color;
+                        rb_left_rotate(sibling);
+                        rb_right_rotate(parent);
+                    }
+                }
+            }
+            else
+            {
+                std::cout << "i wanna be fixed 2\n";
+                sibling->recolor();
+                if (parent->is_black())
+                    fix_db(parent->parent, parent, get_sibling(parent));
+                else
+                    parent->be_black();
+            }
+        }
+        else
+        {
+            std::cout << "i wanna be fixed 3\n";
+            parent->recolor();
+            sibling->recolor();
+            if (child_derection(sibling) == RIGHT)
+                rb_left_rotate(parent);
+            else if (child_derection(sibling) == LEFT)
+                rb_right_rotate(parent);
+            // find a way to send db parent -- problem whent db is NULL
+            fix_db(parent, db, new_sibling(parent, db));
+        }
+    }
+
+    void delete_node(Node *tree_node)
+    {
+        Node *tmp, *tmp2;
+        Node *sibling;
+        Node *parent;
+        Node *db;
+
+        tmp = tree_node;
+        if (tmp->left == this->nil && tmp->right == this->nil)
+        {
+            std::cout << "1++++++\n";
+            sibling = get_sibling(tmp);
+            parent = tmp->parent;
+            db = this->nil;
+            transplant(tmp, this->nil);
+            if (tmp->is_black())
+                fix_db(parent, db, sibling);
+            delete tmp;
+            tmp = this->nil;
+                // std::cout << "double black should be fixed\n";
+        }
+        else if (tmp->left != this->nil && tmp->right == this->nil)
+        {
+            std::cout << "2++++++\n";
+            sibling = get_sibling(tmp);
+            parent = tmp->parent;
+            db = tmp->left;
+            transplant(tmp, tmp->left);
+            // tree_node->left = tmp->left;
+            if (tmp->left->is_black() && tmp->is_black())
+                fix_db(parent, db, sibling);
+                // std::cout << "double black should be fixed\n";
+            else tmp->left->be_black();
+            delete tmp;
+            tmp = this->nil;
+        }
+        else if (tmp->left == this->nil && tmp->right != this->nil)
+        {
+            std::cout << "3++++++\n";
+            sibling = get_sibling(tmp);
+            parent = tmp->parent;
+            db = tmp->right;
+            transplant(tmp, tmp->right);
+            // tree_node->right = tmp->right;
+            if (tmp->right->is_black() && tmp->is_black())
+                fix_db(parent, db, sibling);
+                // std::cout << "double black should be fixed\n";
+            else tmp->right->be_black();
+            delete tmp;
+            tmp = this->nil;
+        }
+        else
+        {
+            std::cout << "4+++++4\n";
+            tmp2 = find_min(tmp->right);
+            sibling = get_sibling(tmp2);
+            parent = tmp2->parent;
+            db = tmp2->right;
+            tmp->data = tmp2->data;
+            transplant(tmp2, tmp2->right);
+
+            std::cout << "color tmp :" << tmp2->data << std::endl;
+            if (tmp2->is_black() && db->is_black())
+                fix_db(parent, db, sibling);
+                // std::cout << "double black should be fixed\n";
+            else tmp2->right->be_black();
+        }
+    }
+// };
 
     // int rotate_r(Node *node)
     // {
@@ -286,7 +493,21 @@ struct RBTree
 
     void delete_(int data)
     {
-        // this->root = delete_node(this->root, data);
+        Node *tmp;
+
+        tmp = this->root;
+        while (tmp != this->nil)
+        {
+            if (tmp->data == data)
+            {
+                delete_node(tmp);
+                break;
+            }
+            else if (tmp->data < data)
+                tmp = tmp->right;
+            else if (tmp->data > data)
+                tmp = tmp->left;
+        }
     }
 
     void inorderTraversalHelper(Node *node)
