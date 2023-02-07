@@ -9,6 +9,19 @@
 /*   Updated: 2023/01/05 19:13:107 by ael-yamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include <memory>
+#ifndef ME
+#define ME
+#include "red_black_tree2.hpp"
+// template<typename T, class _Allocator = std::allocator<T> , class compare = std::less<T> >
+
+template<typename T, class _Allocator , class compare >
+struct RBTree;
+
+// template<typename T, class _Allocator , class compare >
+// struct RBTreeNode;
+
+
 
 namespace ft{
     template<class Iter>
@@ -133,6 +146,55 @@ namespace ft{
 
     };
 
+    // template<class Cat, class T, class Dist= ptrdiff_t, class Ptr= T*, class Ref= T&>
+
+    template <typename T, class allocator>
+    struct Node_iter
+    {
+        typedef allocator allocator_type;
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef typename allocator_type::value_type*        pointer;
+        typedef typename allocator_type::value_type const*  const_pointer;
+        typedef typename allocator_type::size_type          size_type;
+        typedef typename allocator_type::difference_type    difference_type;
+
+    };
+
+    template <typename T, class node_p, class alloc = std::allocator<T> , class comp = std::less<T> >
+    struct RB_Tree_iterator
+    {
+        typedef alloc allocator_type;
+        typedef T value_type;
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef value_type&                                 reference;
+        typedef const value_type&                           const_reference;
+        typedef typename allocator_type::value_type*        pointer;
+        typedef typename allocator_type::value_type const*  const_pointer;
+        typedef typename allocator_type::size_type          size_type;
+        typedef typename allocator_type::difference_type    difference_type;
+        typedef typename RBTree<value_type, allocator_type, comp>::node_ptr __node_ptr;
+        // typedef node_p __node_ptr;
+
+        __node_ptr it;
+        RB_Tree_iterator() {}
+        RB_Tree_iterator(__node_ptr node): it(node) {}
+
+        reference operator*() {return (it->data);}
+        pointer operator->() {return (&(it->data));}
+
+        RB_Tree_iterator &operator++() {it = it->successor(it); return *this;}
+        RB_Tree_iterator operator++(int) {RB_Tree_iterator tmp(*this); ++(*this); return tmp;}
+
+        RB_Tree_iterator &operator--() {it = it->predecessor(it); return *this;}
+        RB_Tree_iterator operator--(int) {RB_Tree_iterator tmp(*this); --(*this); return tmp;}
+
+        __node_ptr base() const {return it;}
+        inline bool operator!=(const RB_Tree_iterator &lhs)
+            { return (this->base() != lhs.base());}
+        inline bool operator==(const RB_Tree_iterator &lhs)
+            { return (this->base() == lhs.base()); }
+    };
+
     template<class InputIterator>
     typename iterator_traits<InputIterator>::difference_type
     distance (InputIterator first, InputIterator last)
@@ -152,5 +214,4 @@ namespace ft{
 
 
 
-
-
+#endif

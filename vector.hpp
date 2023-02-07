@@ -46,7 +46,7 @@ namespace ft{
         // Member functions start
         // // // // // // // //
     
-            vector()
+            explicit vector()
             {
                 __size = 0;
                 __capacity = 0;
