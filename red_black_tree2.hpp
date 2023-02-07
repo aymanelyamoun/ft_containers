@@ -104,19 +104,18 @@ struct RBTree
     };
 //aymane
     typedef Node* node_ptr;
-    typedef Node const* const_node_ptr;
     typedef T type_name;
     typedef _Allocator allocator_type;
 
-    typedef typename ft::RB_Tree_iterator<type_name, node_ptr, allocator_type> iterator;
-    typedef typename ft::RB_Tree_iterator<type_name, const_node_ptr, allocator_type> const_iterator;
+    typedef typename ft::RB_Tree_iterator<type_name, allocator_type, compare> iterator;
+    typedef typename ft::RB_Tree_reverse_iterator<type_name, allocator_type, compare> reverse_iterator;
     iterator __begin;
     Node	*nil;// = new Node(BLACK);
     Node	*root;
     iterator begin(){return (find_min(this->root));}
     iterator end(){return this->nil;}
-    const_iterator cbegin(){return (find_min(this->root));}
-    const_iterator cend(){return this->nil;}
+    reverse_iterator rbegin(){return (find_max(this->root));}
+    reverse_iterator rend(){return this->nil;}
 
     RBTree() { std::cout << "----\n"; nil = new Node(BLACK) ; root = nil;}
 
@@ -522,6 +521,12 @@ struct RBTree
         }
     }
 
+    Node* find_max(Node* root) const
+    {
+        if (root->right == this->nil)
+            return root;
+        return (find_max(root->right));
+    }
     Node *find_min(Node *root)
     {
         if (root->left == this->nil)

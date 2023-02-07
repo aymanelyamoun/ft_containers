@@ -46,7 +46,8 @@ struct test
     int main() 
     {
         RBTree<test> t;
-        RBTree<test>::const_iterator it;
+        RBTree<test>::iterator it;
+        RBTree<test>::reverse_iterator rit;
         int input;
         long long i = 0;
         while(1)
@@ -69,8 +70,13 @@ struct test
             // t.printTree();
         }
         // RBTree<test>::const_iterator it;
-        it = t.cbegin();
-        for (; it != t.cend(); it++)
+        std::cout << "reverse iterating: \n";
+        rit = t.rbegin();
+        for (; rit != t.rend(); rit++)
+            std::cout << rit->memeber1 << " " << rit->memeber2 << std::endl;
+        std::cout << "end of reverse iterating; \n";
+        it = t.begin();
+        for (; it != t.end(); it++)
         {
             // it++;
             it->memeber1 = 63;

@@ -1,7 +1,7 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
-#include "vector.hpp"
+// #include "vector.hpp"
 #include <stack>
 #include <map>
 
@@ -14,34 +14,55 @@ public:
   ~A() { std::cout << "A::~A()" << std::endl; }
 };
 
-int main ()
+int main()
 {
-  std::vector<int> myvector;
-  // std::allocator<A> alloc;
-  // // ft::vector<A> myvector;
+	std::map<int, int> m;
+	std::pair<int, int> p(10, 69);
+	std::map<int, int>::value_type value(p);
 
-  //   A* p = alloc.allocate(5);
-  //   alloc.construct(p, A());
-  //   A* pp = alloc.allocate(5);
-  //   pp[0] = p[0];
-  //   std::cout << pp[0].a << std::endl;
+	// value.first = 10;
+	// value.second = 10;
+	for (int i =0; i < 10; i++)
+	{
+		p = std::pair<int, int>(10, p.second + 10);
+		m.insert(p);
+	}
+	for (std::map<int, int>::reverse_iterator it = m.rbegin(); it != m.rend(); it++)
+	{
+		// m.insert(p);
+		std::cout << it->first << " " << it->second << std::endl;
+	}
 
-  // set some initial content:
-  for (int i=1;i<10;i++) myvector.push_back(i);
-
-  myvector.resize(0);
-  myvector.resize(12);
-  myvector.resize(8, 100);
-  std::cout << "myvector capacity :" << myvector.capacity() << std::endl;
-
-  std::cout << "myvector contains:";
-  std::cout << myvector.size() << std::endl;
-  for (int i=0;i<myvector.size();i++)
-    std::cout << ' ' << myvector[i];
-  std::cout << '\n';
-
-  return 0;
 }
+
+// int main ()
+// {
+//   std::vector<int> myvector;
+//   // std::allocator<A> alloc;
+//   // // ft::vector<A> myvector;
+
+//   //   A* p = alloc.allocate(5);
+//   //   alloc.construct(p, A());
+//   //   A* pp = alloc.allocate(5);
+//   //   pp[0] = p[0];
+//   //   std::cout << pp[0].a << std::endl;
+
+//   // set some initial content:
+//   for (int i=1;i<10;i++) myvector.push_back(i);
+
+//   myvector.resize(0);
+//   myvector.resize(12);
+//   myvector.resize(8, 100);
+//   std::cout << "myvector capacity :" << myvector.capacity() << std::endl;
+
+//   std::cout << "myvector contains:";
+//   std::cout << myvector.size() << std::endl;
+//   for (int i=0;i<myvector.size();i++)
+//     std::cout << ' ' << myvector[i];
+//   std::cout << '\n';
+
+//   return 0;
+// }
 
 // int main()
 // {

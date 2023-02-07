@@ -160,7 +160,7 @@ namespace ft{
 
     };
 
-    template <typename T, class node_p, class alloc = std::allocator<T> , class comp = std::less<T> >
+    template <typename T, class alloc, class comp>
     struct RB_Tree_iterator
     {
         typedef alloc allocator_type;
@@ -192,6 +192,41 @@ namespace ft{
         inline bool operator!=(const RB_Tree_iterator &lhs)
             { return (this->base() != lhs.base());}
         inline bool operator==(const RB_Tree_iterator &lhs)
+            { return (this->base() == lhs.base()); }
+    };
+
+    template <typename T, class alloc, class comp>
+    struct RB_Tree_reverse_iterator
+    {
+        typedef alloc allocator_type;
+        typedef T value_type;
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef value_type&                                 reference;
+        typedef const value_type&                           const_reference;
+        typedef typename allocator_type::value_type*        pointer;
+        typedef typename allocator_type::value_type const*  const_pointer;
+        typedef typename allocator_type::size_type          size_type;
+        typedef typename allocator_type::difference_type    difference_type;
+        typedef typename RBTree<value_type, allocator_type, comp>::node_ptr __node_ptr;
+        // typedef node_p __node_ptr;
+
+        __node_ptr it;
+        RB_Tree_reverse_iterator() {}
+        RB_Tree_reverse_iterator(__node_ptr node): it(node) {}
+
+        reference operator*() {return (it->data);}
+        pointer operator->() {return (&(it->data));}
+
+        RB_Tree_reverse_iterator &operator++() {it = it->predecessor(it); return *this;}
+        RB_Tree_reverse_iterator operator++(int) {RB_Tree_reverse_iterator tmp(*this); ++(*this); return tmp;}
+
+        RB_Tree_reverse_iterator &operator--() {it = it->successor(it); return *this;}
+        RB_Tree_reverse_iterator operator--(int) {RB_Tree_reverse_iterator tmp(*this); --(*this); return tmp;}
+
+        __node_ptr base() const {return it;}
+        inline bool operator!=(const RB_Tree_reverse_iterator &lhs)
+            { return (this->base() != lhs.base());}
+        inline bool operator==(const RB_Tree_reverse_iterator &lhs)
             { return (this->base() == lhs.base()); }
     };
 
