@@ -18,7 +18,8 @@ public:
 
 int main()
 {
-	ft::map<int, int> m;
+	// ft::map<int, int> m;
+	std::vector<std::pair<int, int> > v;
 	std::pair<int, int> p(10, 69);
 	ft::map<int, int>::value_type value(p);
 
@@ -33,18 +34,22 @@ int main()
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
-			m.insert(p);
+			v.push_back(p);
+			// m.insert(p);
 		}
 		else if (input == 2)
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
-			m.delete_(p);
+			// m.delete_(p);
 		}
 		else if (input == 3)
 			break;
 	}
-	for (ft::map<int, int>::reverse_iterator it = m.rbegin(); it != m.rend(); it++)
+
+	ft::map<int, int> m(v.begin(), v.end());
+	// m.insert(v.begin(), v.end());
+	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
 	{
 		// m.insert(p);
 		std::cout << it->first << " " << it->second << std::endl;

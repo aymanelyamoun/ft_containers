@@ -126,6 +126,7 @@ struct RBTree
     reverse_iterator rend(){return this->nil;}
 
     RBTree() {nil = new Node(BLACK) ; root = nil;}
+    RBTree(const value_compare& __comp, const allocator_type& __a) {nil = new Node(BLACK) ; root = nil;}
 
     int child_derection(Node *root)
     {
@@ -572,6 +573,15 @@ struct RBTree
                 delete_node(tmp);
                 break;
             }
+        }
+    }
+
+	template <class InputIterator>
+    void insert (InputIterator first, InputIterator last)
+    {
+        for (;first != last; first++)
+        {
+            this->insert(*first);
         }
     }
 

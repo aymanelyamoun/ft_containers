@@ -51,14 +51,27 @@ namespace ft
 		};
 
 	private:
-		typedef RBTree<value_type, get_key_pairs<const key_type, value_type>, allocator_type, key_compare> RB_tree;
+		typedef get_key_pairs<const key_type, value_type> _get_key_pairs;
+		typedef RBTree<value_type, _get_key_pairs, allocator_type, key_compare> RB_tree;
 		RB_tree tree;
 	public:
 		typedef typename RB_tree::iterator iterator;
 		typedef typename RB_tree::reverse_iterator reverse_iterator;
 
+		explicit map (const key_compare& _comp = key_compare(), const allocator_type& alloc = allocator_type())
+		: tree(key_compare(_comp), allocator_type(alloc)) {}
+
+		template <class InputIterator>
+		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+		{ insert(first, last); }
+
+		iterator begin() {return tree.begin();}
+		iterator end() {return tree.end();}
 		reverse_iterator rbegin() {return tree.rbegin();}
 		reverse_iterator rend() {return tree.rend();}
+
+		template <class InputIterator>
+		void insert (InputIterator first, InputIterator last) { tree.insert(first, last); }
 
 		void insert(value_type value)
 		{
