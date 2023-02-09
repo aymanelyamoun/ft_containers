@@ -15,7 +15,7 @@
 #include "red_black_tree2.hpp"
 // template<typename T, class _Allocator = std::allocator<T> , class compare = std::less<T> >
 
-template<typename T, class _Allocator , class compare >
+template<typename T, class _get_key, class _Allocator , class compare >
 struct RBTree;
 
 // template<typename T, class _Allocator , class compare >
@@ -148,19 +148,19 @@ namespace ft{
 
     // template<class Cat, class T, class Dist= ptrdiff_t, class Ptr= T*, class Ref= T&>
 
-    template <typename T, class allocator>
-    struct Node_iter
-    {
-        typedef allocator allocator_type;
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef typename allocator_type::value_type*        pointer;
-        typedef typename allocator_type::value_type const*  const_pointer;
-        typedef typename allocator_type::size_type          size_type;
-        typedef typename allocator_type::difference_type    difference_type;
+    // template <typename T, class allocator>
+    // struct Node_iter
+    // {
+    //     typedef allocator allocator_type;
+    //     typedef std::bidirectional_iterator_tag iterator_category;
+    //     typedef typename allocator_type::value_type*        pointer;
+    //     typedef typename allocator_type::value_type const*  const_pointer;
+    //     typedef typename allocator_type::size_type          size_type;
+    //     typedef typename allocator_type::difference_type    difference_type;
 
-    };
+    // };
 
-    template <typename T, class alloc, class comp>
+    template <typename T, class _get_key, class alloc, class comp>
     struct RB_Tree_iterator
     {
         typedef alloc allocator_type;
@@ -172,7 +172,7 @@ namespace ft{
         typedef typename allocator_type::value_type const*  const_pointer;
         typedef typename allocator_type::size_type          size_type;
         typedef typename allocator_type::difference_type    difference_type;
-        typedef typename RBTree<value_type, allocator_type, comp>::node_ptr __node_ptr;
+        typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
         // typedef node_p __node_ptr;
 
         __node_ptr it;
@@ -195,7 +195,7 @@ namespace ft{
             { return (this->base() == lhs.base()); }
     };
 
-    template <typename T, class alloc, class comp>
+    template <typename T, class _get_key, class alloc, class comp>
     struct RB_Tree_reverse_iterator
     {
         typedef alloc allocator_type;
@@ -207,7 +207,7 @@ namespace ft{
         typedef typename allocator_type::value_type const*  const_pointer;
         typedef typename allocator_type::size_type          size_type;
         typedef typename allocator_type::difference_type    difference_type;
-        typedef typename RBTree<value_type, allocator_type, comp>::node_ptr __node_ptr;
+        typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
         // typedef node_p __node_ptr;
 
         __node_ptr it;

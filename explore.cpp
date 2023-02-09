@@ -1,4 +1,5 @@
 #include <vector>
+#include "map.hpp"
 #include <iterator>
 #include <iostream>
 // #include "vector.hpp"
@@ -14,25 +15,40 @@ public:
   ~A() { std::cout << "A::~A()" << std::endl; }
 };
 
+
 int main()
 {
-	std::map<int, int> m;
+	ft::map<int, int> m;
 	std::pair<int, int> p(10, 69);
-	std::map<int, int>::value_type value(p);
+	ft::map<int, int>::value_type value(p);
 
 	// value.first = 10;
 	// value.second = 10;
-	for (int i =0; i < 10; i++)
+	// for (int i =0; i < 10; i++)
+	int input;
+	while(1)
 	{
-		p = std::pair<int, int>(10, p.second + 10);
-		m.insert(p);
+		std::cin >> input;
+		if (input == 1)
+		{
+			std::cin >> input;
+			p = std::pair<const int, int>(input, input + 10);
+			m.insert(p);
+		}
+		else if (input == 2)
+		{
+			std::cin >> input;
+			p = std::pair<const int, int>(input, input + 10);
+			m.delete_(p);
+		}
+		else if (input == 3)
+			break;
 	}
-	for (std::map<int, int>::reverse_iterator it = m.rbegin(); it != m.rend(); it++)
+	for (ft::map<int, int>::reverse_iterator it = m.rbegin(); it != m.rend(); it++)
 	{
 		// m.insert(p);
 		std::cout << it->first << " " << it->second << std::endl;
 	}
-
 }
 
 // int main ()

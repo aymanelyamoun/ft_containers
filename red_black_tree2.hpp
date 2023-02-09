@@ -9,11 +9,18 @@
 
 enum {LEFT = 1, RIGHT, BOTH};
 
-template<typename T, class _Allocator = std::allocator<T> , class compare = std::less<T> >
+template <typename T>
+struct get_key
+{
+    T operator()(T &value) {return value;}
+};
+
+template<typename T, class _get_key = get_key<T> , class _Allocator = std::allocator<T> , class compare = std::less<T> >
 
 struct RBTree
 {
     typedef compare value_compare;
+    _get_key key;
     value_compare comp;
     struct Node
     {
@@ -27,6 +34,7 @@ struct RBTree
         Node(T data, RBTree *tree): data(data), right(tree->nil), left(tree->nil), parent(tree->nil), color(RED){nodes_tree = tree;}
 
         Node(bool color): color(color), right(NULL), left(NULL), parent(NULL) {}
+        Node (const Node & obj):color(obj.color), right(obj.right), left(obj.left), parent(obj.parent), data(obj.data) {nodes_tree = obj.nodes_tree;}
         void recolor() { color = !color;}
         void be_black() {color = BLACK;}
         void be_red() {color = RED;}
@@ -107,8 +115,8 @@ struct RBTree
     typedef T type_name;
     typedef _Allocator allocator_type;
 
-    typedef typename ft::RB_Tree_iterator<type_name, allocator_type, compare> iterator;
-    typedef typename ft::RB_Tree_reverse_iterator<type_name, allocator_type, compare> reverse_iterator;
+    typedef typename ft::RB_Tree_iterator<type_name, _get_key, allocator_type, compare> iterator;
+    typedef typename ft::RB_Tree_reverse_iterator<type_name, _get_key, allocator_type, compare> reverse_iterator;
     iterator __begin;
     Node	*nil;// = new Node(BLACK);
     Node	*root;
@@ -117,7 +125,7 @@ struct RBTree
     reverse_iterator rbegin(){return (find_max(this->root));}
     reverse_iterator rend(){return this->nil;}
 
-    RBTree() { std::cout << "----\n"; nil = new Node(BLACK) ; root = nil;}
+    RBTree() {nil = new Node(BLACK) ; root = nil;}
 
     int child_derection(Node *root)
     {
@@ -321,6 +329,16 @@ struct RBTree
         }
     }
 
+    void assign_with_p(Node *root, Node *replace)
+    {
+        if (root == this->root)
+            this->root = replace;
+        else if (child_derection(root) == LEFT)
+            root->left = replace;
+        else if (child_derection(root) == RIGHT)
+            root->right = replace;
+    }
+
     void delete_node(Node *tree_node)
     {
         Node *tmp, *tmp2;
@@ -383,7 +401,9 @@ struct RBTree
             std::cout << tmp->parent << std::endl;
             std::cout << this->nil << std::endl;
             db = tmp2->right;
-            tmp->data = tmp2->data;
+            Node *replace = new Node(*tmp);
+            assign_with_p(tmp, replace);
+            // tmp->data = tmp2->data;
             transplant(tmp2, tmp2->right);
 
             // std::cout << "color tmp :" << tmp2->data << std::endl;
@@ -487,7 +507,7 @@ struct RBTree
         {
             return (new Node(data, this));
         }
-        if (comp(root->data, data))// data > root->data)//
+        if (comp(key(root->data), key(data)))// data > root->data)//
         {
             root->right = insert_util(root->right, data, &rotate);
             root->right->parent = root;
@@ -496,7 +516,7 @@ struct RBTree
             if (rotate)
                 return (do_right_rotate(root, rotate));
         }
-        if (comp(data, root->data))
+        if (comp(key(data), key(root->data)))
         // if (data < root->data)
         {
             root->left = insert_util(root->left, data, &rotate);
@@ -543,9 +563,9 @@ struct RBTree
         tmp = this->root;
         while (tmp != this->nil)
         {
-            if (comp(tmp->data, data))// tmp->data < data)
+            if (comp(key(tmp->data), key(data)))// tmp->data < data)
                 tmp = tmp->right;
-            else if (comp(data, tmp->data))// tmp->data > data)
+            else if (comp(key(data), key(tmp->data)))// tmp->data > data)
                 tmp = tmp->left;
             else
             {

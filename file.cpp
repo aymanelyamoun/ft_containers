@@ -41,13 +41,23 @@ struct test
     bool operator<(test const &obj) const {return this->memeber1 < obj.memeber1;}
 };
 
+template<typename key, typename value>
+class compare_pair
+{
+    public:
+    bool operator()(std::pair<const key, const value> p1, std::pair<const key, const value> p2) const
+    {
+        return p1.first < p2.first;
+    }
+};
+
 #include <string>
 // #include <set>
     int main() 
     {
-        RBTree<test> t;
-        RBTree<test>::iterator it;
-        RBTree<test>::reverse_iterator rit;
+        RBTree<std::pair<int, int>, std::allocator<std::pair<int, int> >, compare_pair<int, int> > t;
+        RBTree<std::pair<int, int>, std::allocator<std::pair<int, int> >, compare_pair<int, int> >::iterator it;
+        RBTree<std::pair<int, int>, std::allocator<std::pair<int, int> >, compare_pair<int, int> >::reverse_iterator rit;
         int input;
         long long i = 0;
         while(1)
@@ -56,12 +66,12 @@ struct test
             if (input == 1)
             {
                 std::cin >> input;
-                t.insert(test(input));
+                t.insert(std::pair<int, int>(input, input + 10));
             }
             else if (input == 2)
             {
                 std::cin >> input;
-                t.delete_(test(input));
+                t.delete_(std::pair<int, int>(input, input + 10));
             }
             else if (input == 3)
                 break;
@@ -73,16 +83,16 @@ struct test
         std::cout << "reverse iterating: \n";
         rit = t.rbegin();
         for (; rit != t.rend(); rit++)
-            std::cout << rit->memeber1 << " " << rit->memeber2 << std::endl;
+            std::cout << rit->first << " " << rit->second << std::endl;
         std::cout << "end of reverse iterating; \n";
         it = t.begin();
         for (; it != t.end(); it++)
         {
             // it++;
-            it->memeber1 = 63;
-            std::cout << it->memeber1 << " " << it->memeber2 << std::endl;
+            it->first = 63;
+            std::cout << it->first << " " << it->second << std::endl;
         }
-        std::cout << it->memeber1;
+        std::cout << it->first;
     }
 
 // int main() {
