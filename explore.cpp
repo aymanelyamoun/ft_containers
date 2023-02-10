@@ -15,14 +15,12 @@ public:
   ~A() { std::cout << "A::~A()" << std::endl; }
 };
 
-
 int main()
 {
 	// ft::map<int, int> m;
 	std::vector<std::pair<int, int> > v;
 	std::pair<int, int> p(10, 69);
 	ft::map<int, int>::value_type value(p);
-
 	// value.first = 10;
 	// value.second = 10;
 	// for (int i =0; i < 10; i++)
@@ -46,10 +44,31 @@ int main()
 		else if (input == 3)
 			break;
 	}
-
+	// std::map<int, int> mm(v.begin(), v.end());
+	// std::cout << "search: ";
+	// std::cin >> input;
+	// try
+	// {
+	// 	mm.at(input);
+	// }
+	// catch(std::exception &e)
+	// {
+	// 	std::cout << e.what();
+	// };
 	ft::map<int, int> m(v.begin(), v.end());
+	ft::map<int, int> m2(m);
+	std::cout << "add aditional value\n";
+	std::cin >> input;
+	p = std::pair<const int, int>(input, input + 10);
+	m.insert(p);
+	m2 = m;
+	std::cout << "search for value\n";
+	std::cin >> input;
+	
+	int &me = m2.at(input);
+	me = 159;
 	// m.insert(v.begin(), v.end());
-	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+	for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
 	{
 		// m.insert(p);
 		std::cout << it->first << " " << it->second << std::endl;

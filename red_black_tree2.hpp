@@ -12,6 +12,7 @@ enum {LEFT = 1, RIGHT, BOTH};
 template <typename T>
 struct get_key
 {
+    typedef T key_type;
     T operator()(T &value) {return value;}
 };
 
@@ -113,6 +114,7 @@ struct RBTree
 //aymane
     typedef Node* node_ptr;
     typedef T type_name;
+    typedef type_name& reference;
     typedef _Allocator allocator_type;
 
     typedef typename ft::RB_Tree_iterator<type_name, _get_key, allocator_type, compare> iterator;
@@ -120,13 +122,70 @@ struct RBTree
     iterator __begin;
     Node	*nil;// = new Node(BLACK);
     Node	*root;
-    iterator begin(){return (find_min(this->root));}
-    iterator end(){return this->nil;}
-    reverse_iterator rbegin(){return (find_max(this->root));}
-    reverse_iterator rend(){return this->nil;}
+    iterator begin() const{return (find_min(this->root));}
+    iterator end() const {return this->nil;}
+    reverse_iterator rbegin() const {return (find_max(this->root));}
+    reverse_iterator rend() const{return this->nil;}
 
     RBTree() {nil = new Node(BLACK) ; root = nil;}
     RBTree(const value_compare& __comp, const allocator_type& __a) {nil = new Node(BLACK) ; root = nil;}
+    RBTree(const RBTree& tree)
+    {
+        nil = new Node(BLACK) ; root = nil;
+        insert(tree.begin(), tree.end());
+    }
+    ~RBTree()
+    {
+        // std::cout << "tree c was called\n";
+        free_tree();
+        // std::cout << "tree c is done\n";
+        
+    }
+
+    RBTree& operator=(const RBTree& tree)
+    {
+        // if (*this != tree)
+            insert(tree.begin(), tree.end());
+        return (*this);
+    }
+
+    allocator_type get_allocator() const
+    {
+        return allocator_type();
+    }
+
+    node_ptr find(typename _get_key::key_type value)
+    {
+        Node *tmp;
+
+        tmp = this->root;
+        while (tmp != this->nil)
+        {
+            if (comp(key(tmp->data), value))// tmp->data < data)
+                tmp = tmp->right;
+            else if (comp(value, key(tmp->data)))
+            // else if (comp(key(data), value))// tmp->data > data)
+                tmp = tmp->left;
+            else
+            {
+                break;
+            }
+        }
+        return tmp;
+    }
+
+    void free_tree()
+    {
+        iterator it;
+        it = begin();
+        iterator tmp;
+        for (;it != this->end(); it++)
+        {
+            // tmp = it;
+            // std::cout << it->first << std::endl;
+            delete_(it);
+        } 
+    }
 
     int child_derection(Node *root)
     {
@@ -350,7 +409,6 @@ struct RBTree
         tmp = tree_node;
         if (tmp->left == this->nil && tmp->right == this->nil)
         {
-            std::cout << "++++1\n";
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = this->nil;
@@ -362,11 +420,6 @@ struct RBTree
         }
         else if (tmp->left != this->nil && tmp->right == this->nil)
         {
-            // std::cout << "++++2\n";
-            // std::cout << tmp->data << std::endl;
-            // std::cout << tmp->parent->data << std::endl;
-            // std::cout << tmp->parent << std::endl;
-            // std::cout << this->nil << std::endl;
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = tmp->left;
@@ -379,7 +432,6 @@ struct RBTree
         }
         else if (tmp->left == this->nil && tmp->right != this->nil)
         {
-            // std::cout << "++++3\n";
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = tmp->right;
@@ -394,24 +446,17 @@ struct RBTree
         {
             std::cout << "++++4\n";
             tmp2 = find_min(tmp->right);
-
-            // std::cout << tmp2->data << std::endl;
             sibling = get_sibling(tmp2);
             parent = tmp2->parent;
-            // std::cout << tmp2->parent->data << std::endl;
             std::cout << tmp->parent << std::endl;
             std::cout << this->nil << std::endl;
             db = tmp2->right;
             Node *replace = new Node(*tmp);
             assign_with_p(tmp, replace);
-            // tmp->data = tmp2->data;
             transplant(tmp2, tmp2->right);
-
-            // std::cout << "color tmp :" << tmp2->data << std::endl;
             if (tmp2->is_black() && db->is_black())
                 fix_db(parent, db, sibling);
             else tmp2->right->be_black();
-            // this was addede
             delete tmp2;
             tmp2 = this->nil;
         }
@@ -548,7 +593,7 @@ struct RBTree
             return root;
         return (find_max(root->right));
     }
-    Node *find_min(Node *root)
+    Node *find_min(Node *root) const
     {
         if (root->left == this->nil)
             return root;
@@ -574,6 +619,11 @@ struct RBTree
                 break;
             }
         }
+    }
+	template <class InputIterator>
+    void delete_(InputIterator it)
+    {
+        delete_(*it);
     }
 
 	template <class InputIterator>

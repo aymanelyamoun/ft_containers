@@ -11,6 +11,7 @@ namespace ft
 	struct get_key_pairs
 	{
 		typedef T value_type;
+		typedef key key_type;
 
 		key operator()(value_type &p1)
 		{
@@ -54,6 +55,7 @@ namespace ft
 		typedef get_key_pairs<const key_type, value_type> _get_key_pairs;
 		typedef RBTree<value_type, _get_key_pairs, allocator_type, key_compare> RB_tree;
 		RB_tree tree;
+		typedef typename RB_tree::node_ptr node_ptr;
 	public:
 		typedef typename RB_tree::iterator iterator;
 		typedef typename RB_tree::reverse_iterator reverse_iterator;
@@ -65,6 +67,40 @@ namespace ft
 		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 		{ insert(first, last); }
 
+		map (const map& x): tree(x.tree){}
+
+		map& operator= (const map& x)
+		{
+			tree = x.tree;
+			return (*this);
+		}
+
+    	allocator_type get_allocator() const
+		{
+			return allocator_type();
+		}
+
+		mapped_type &at(key_type value)
+		{
+			node_ptr tmp;
+			tmp = tree.find(value);
+			if (tmp == tree.nil)
+				throw std::out_of_range("map::at:  key not foundadd aditional value");
+			return (tmp->data.second);
+		}
+
+		// mapped_type& operator[] (const key_type& k)
+		// {
+		// 	node_ptr tmp;
+
+		// 	tmp = tree.find(k);
+		// 	if (tmp == tree.nil)
+		// 		tree.insert(k);
+		// 	tmp = tree.find(k);
+		// 	return (tmp->data.second);
+		// }
+		// ~map(){std::cout << "map c was called\n";//tree.~RBTree(); }
+
 		iterator begin() {return tree.begin();}
 		iterator end() {return tree.end();}
 		reverse_iterator rbegin() {return tree.rbegin();}
@@ -72,6 +108,11 @@ namespace ft
 
 		template <class InputIterator>
 		void insert (InputIterator first, InputIterator last) { tree.insert(first, last); }
+
+		// iterator insert (iterator position, const value_type& val)
+		// {
+
+		// }
 
 		void insert(value_type value)
 		{
