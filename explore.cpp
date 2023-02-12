@@ -34,6 +34,7 @@ int main()
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
+			// m.insert(p);
 			pos = m.insert(m.begin(), p);
 			// m.insert(p, 'a');
 			// v.push_back(p);
@@ -42,16 +43,25 @@ int main()
 		}
 		else if (input == 2)
 		{
+			for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+			{
+				// m.insert(p);
+				std::cout << it->first << " " << it->second << std::endl;
+			}
 			std::cin >> input;
-			p = std::pair<const int, int>(input, input + 10);
-			m.delete_(p);
+			std::cout << "next : " << m.erase(m.find(input))->first << std::endl;
+			// m.delete_(p);
 		}
 		else if (input == 3)
 			break;
 	}
 	// std::map<int, int> mm(v.begin(), v.end());
 	// std::cout << "search: ";
-	// std::cin >> input;
+	// int val;
+	std::cin >> input;
+	std::cout << m.count(input) << std::endl;
+	// std::cin >> val;
+	// m[input] = val;
 	// try
 	// {
 	// 	mm.at(input);
@@ -73,11 +83,11 @@ int main()
 	// int &me = m2[input];
 	// me = 159;
 	// m.insert(v.begin(), v.end());
-	// for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
-	// {
+	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+	{
 		// m.insert(p);
-		// std::cout << it->first << " " << it->second << std::endl;
-	// }
+		std::cout << it->first << " " << it->second << std::endl;
+	}
 }
 
 // int main ()

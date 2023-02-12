@@ -24,6 +24,7 @@ struct RBTree
     _get_key key;
     value_compare comp;
     typedef typename _get_key::key_type key_type;
+	typedef typename _Allocator::size_type size_type;
     struct Node
     {
         T data;
@@ -155,7 +156,7 @@ struct RBTree
         return allocator_type();
     }
 
-    iterator find(key_type value)
+    iterator find(key_type value) const
     {
         Node *tmp;
 
@@ -174,6 +175,72 @@ struct RBTree
         return iterator (tmp);
     }
 
+    iterator find(node_ptr *parent, key_type value) const
+    {
+        Node *tmp;
+
+        tmp = this->root;
+        while (tmp != this->nil)
+        {
+            *parent = tmp;
+            if (comp(key(tmp->data), value))// tmp->data < data)
+                tmp = tmp->right;
+            else if (comp(value, key(tmp->data)))
+                tmp = tmp->left;
+            else
+            {
+                break;
+            }
+        }
+        return iterator (tmp);
+    }
+
+    iterator find(iterator pos, node_ptr *parent, key_type value) const
+    {
+        std::cout << "entered to the find with pos: \n";
+        if (pos == end() || comp(value, key(*pos)))
+        {
+            std::cout << "struck in 1\n";
+            iterator prior = pos;
+            if (pos == begin() || comp(key(*(--prior)), value))
+            {
+                if (pos.base()->left == this->nil)
+                {
+                    *parent = pos.base();
+                    return (iterator(this->nil));
+                }
+                else
+                {
+                    *parent = prior.base();
+                    return (iterator(prior.base()->right));
+                }
+            }
+            return (find(parent, value));
+        }
+        else if (comp(key(*pos), value))
+        {
+            std::cout << "struck in 2\n";
+            iterator next = pos;
+            if (next == end() || comp(value, key(*(++next))))
+            {
+                if (pos.base()->right == this->nil)
+                {
+                    *parent = pos.base();
+                    return pos.base()->right;
+                }
+                else
+                {
+                    *parent = next.base();
+                    return next.base()->left;
+                }
+            }
+            return (find(parent, value));
+        }
+        std::cout << "got out from the find with pos: \n";
+        *parent = pos.base();
+        return pos.base();
+    }
+
     void free_tree()
     {
         iterator it;
@@ -183,7 +250,8 @@ struct RBTree
         {
             // tmp = it;
             // std::cout << it->first << std::endl;
-            delete_(it);
+			erase(it);
+            // delete_(it);
         } 
     }
 
@@ -621,27 +689,18 @@ struct RBTree
 	{
 		node_ptr tmp;
 		node_ptr parent;
-		bool found = false;
+		bool found = true;
 		node_ptr node;
 
-		tmp = pos.base();
 		parent = this->nil;
-		while (tmp != this->nil)
-		{
-			parent = tmp;
-			if (comp(key(tmp->data), key(data)))
-				tmp = tmp->right;
-			else if (comp(key(data), key(tmp->data)))
-				tmp = tmp->left;
-			else
-			{
-				found = true;
-				node = tmp;
-				break;
-			}
-		}
+        node = find(pos, &parent, key(data)).base();
+        
+        if (node == this->nil || root == this->nil)
+            found = false;
+
 		if (!found)
 		{
+        std::cout << "struck out\n";
 			node = new Node(data, this);
 			if (parent == this->nil)
 			{
@@ -688,26 +747,26 @@ struct RBTree
         return ret;
     }
 
-    std::pair<iterator, bool> insert(typename _get_key::key_type key)
-    {
-        std::pair<iterator, bool> ret;
-        type_name data(key, 0);
+    // std::pair<iterator, bool> insert(key_type key)
+    // {
+    //     std::pair<iterator, bool> ret;
+    //     type_name data(key, 0);
 
-        // data.first = key;
-        // data.second = my_allocator.construct();
-        ret.first = this->nil;
-        ret.second = false;
-        if (this->root == this->nil)
-        {
-            this->root = insert_util(root, data, 0, ret);
-            this->root->recolor();
-        }
-        else
-        {
-            this->root = insert_util(this->root, data, 0, ret);
-        }
-        return ret;
-    }
+    //     // data.first = key;
+    //     // data.second = my_allocator.construct();
+    //     ret.first = this->nil;
+    //     ret.second = false;
+    //     if (this->root == this->nil)
+    //     {
+    //         this->root = insert_util(root, data, 0, ret);
+    //         this->root->recolor();
+    //     }
+    //     else
+    //     {
+    //         this->root = insert_util(this->root, data, 0, ret);
+    //     }
+    //     return ret;
+    // }
 
     Node* find_max(Node* root) const
     {
@@ -725,30 +784,66 @@ struct RBTree
     }
 
     /* add the delete logic here */
+	iterator erase( iterator pos )
+	{
+	    Node *tmp;
 
-    void delete_(T data)
+        tmp = pos.base();
+		std::cout << "pos" << pos->first << std::endl;
+		++pos;
+		std::cout << "ret" << pos->first << std::endl;
+
+        // while (tmp != this->nil)
+        // {
+        //     if (comp(key(tmp->data), key(data)))// tmp->data < data)
+        //         tmp = tmp->right;
+        //     else if (comp(key(data), key(tmp->data)))// tmp->data > data)
+        //         tmp = tmp->left;
+            // else
+            // {
+        delete_node(tmp);
+                // break;
+            // }
+        // }
+		return pos;
+	}
+
+	iterator erase( iterator first, iterator last )
+	{
+		iterator ret = first++;
+
+		for(; first != last; first++)
+			ret = erase(first);
+		return ret;
+	}
+
+    size_type erase(T data)
     {
         Node *tmp;
+		size_type found = 0;
 
         tmp = this->root;
         while (tmp != this->nil)
         {
-            if (comp(key(tmp->data), key(data)))// tmp->data < data)
+            if (comp(key(tmp->data), key(data)))
                 tmp = tmp->right;
-            else if (comp(key(data), key(tmp->data)))// tmp->data > data)
+            else if (comp(key(data), key(tmp->data)))
                 tmp = tmp->left;
             else
             {
+				found = 1;
                 delete_node(tmp);
                 break;
             }
         }
+		return found;
     }
-	template <class InputIterator>
-    void delete_(InputIterator it)
-    {
-        delete_(*it);
-    }
+
+	// template <class InputIterator>
+    // void delete_(InputIterator it)
+    // {
+    //     delete_(*it);
+    // }
 
 	template <class InputIterator>
     void insert (InputIterator first, InputIterator last)

@@ -13,7 +13,7 @@ namespace ft
 		typedef T value_type;
 		typedef key key_type;
 
-		key operator()(value_type &p1)
+		key operator()(value_type &p1) const
 		{
 			return p1.first;
 		}
@@ -93,14 +93,7 @@ namespace ft
 
 		mapped_type& operator[] (const key_type& k)
 		{
-			iterator tmp;
-
-			tmp = tree.find(k);
-			if (tmp == tree.nil)
-				return (tree.insert(k).first->second);
-			return (tmp->second);
-				// tree.insert(k);
-			// tmp = tree.find(k);
+			return (tree.insert(value_type(k, mapped_type())).first->second);
 		}
 
 		void print()
@@ -109,13 +102,17 @@ namespace ft
 		}
 		// ~map(){std::cout << "map c was called\n";//tree.~RBTree(); }
 
+		/// iterators
+
 		iterator begin() {return tree.begin();}
-		iterator end() {return tree.end();}
+		iterator end() const {return tree.end();}
 		reverse_iterator rbegin() {return tree.rbegin();}
 		reverse_iterator rend() {return tree.rend();}
 
+		/// iterators end
 
-		//capcity 
+		// capcity 
+
 		bool empty() const
 		{
 			return (tree.begin() == tree.end());
@@ -133,39 +130,63 @@ namespace ft
 
 		//end capacity
 
+		// modifiers 
+
 		void clear() {tree.free_tree();}
 
-		void swap( map& other )
-		{
-
-		}
-
+		
 		template <class InputIterator>
 		void insert (InputIterator first, InputIterator last) { tree.insert(first, last); }
-
-		// iterator insert (iterator position, const value_type& val)
-		// {
-
-		// }
 
 		std::pair<iterator, bool> insert(value_type value)
 		{
 			return tree.insert(value);
 		}
 
-		// std::pair<iterator, bool> insert(value_type data, char c)
-		// {
-		// 	return (tree.insert(data, c));
-		// }
-
 		iterator insert(iterator pos, value_type data)
 		{
 			return (tree.insert(pos, data));
 		}
+
+		iterator erase( iterator pos )
+		{
+			return tree.erase(pos);
+		}
+
+		size_type count( const key_type& key ) const
+		{
+			return (find(key) != end());
+		}
+
 		void delete_(value_type value)
 		{
 			tree.delete_(value);
 		}
+
+		// modifiers end
+
+		// lookup
+		iterator find( const key_type& key ) const
+		{
+			return (tree.find(key));
+		}
+
+		iterator lower_bound( const key_type& key )
+		{
+			return tree.lower_bound();
+		}
+
+		// lookup end
+		// iterator insert (iterator position, const value_type& val)
+		// {
+
+		// }
+
+
+		// std::pair<iterator, bool> insert(value_type data, char c)
+		// {
+		// 	return (tree.insert(data, c));
+		// }
 
 	};
 }
