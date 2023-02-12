@@ -661,16 +661,12 @@ struct RBTree
 		return std::pair<iterator, bool>(node, !found);
 	}
 
-	std::pair<iterator, bool> insert(T data, char c)
+	// std::pair<iterator, bool> insert(T data)
+	// {
+	// 	return (insert_while(root, data));
+	// }
+	iterator insert(iterator pos, T data)
 	{
-		char a;
-		a = c;
-		return (insert_while(root, data));
-	}
-	iterator insert(iterator pos, T data, char c)
-	{
-		char a;
-		a = c;
 		return (insert_while(pos, data).first);
 	}
 

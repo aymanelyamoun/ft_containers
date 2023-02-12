@@ -34,7 +34,7 @@ int main()
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
-			pos = m.insert(m.begin(), p, 'a');
+			pos = m.insert(m.begin(), p);
 			// m.insert(p, 'a');
 			// v.push_back(p);
 			// pos = m.insert(pos,p);
