@@ -23,6 +23,7 @@ struct RBTree
     typedef compare value_compare;
     _get_key key;
     value_compare comp;
+    typedef typename _get_key::key_type key_type;
     struct Node
     {
         T data;
@@ -154,7 +155,7 @@ struct RBTree
         return allocator_type();
     }
 
-    node_ptr find(typename _get_key::key_type value)
+    iterator find(key_type value)
     {
         Node *tmp;
 
@@ -164,14 +165,13 @@ struct RBTree
             if (comp(key(tmp->data), value))// tmp->data < data)
                 tmp = tmp->right;
             else if (comp(value, key(tmp->data)))
-            // else if (comp(key(data), value))// tmp->data > data)
                 tmp = tmp->left;
             else
             {
                 break;
             }
         }
-        return tmp;
+        return iterator (tmp);
     }
 
     void free_tree()
@@ -444,12 +444,9 @@ struct RBTree
         }
         else
         {
-            std::cout << "++++4\n";
             tmp2 = find_min(tmp->right);
             sibling = get_sibling(tmp2);
             parent = tmp2->parent;
-            std::cout << tmp->parent << std::endl;
-            std::cout << this->nil << std::endl;
             db = tmp2->right;
             Node *replace = new Node(*tmp);
             assign_with_p(tmp, replace);
@@ -545,17 +542,20 @@ struct RBTree
         return (tmp);
     }
 
-    Node *insert_util(Node *root, T data, int *rotation)
+    Node *insert_util(Node *root, T data, int *rotation, std::pair<iterator, bool> &ret)
     {
         int rotate = 0;
 
         if (root == this->nil)
         {
-            return (new Node(data, this));
+            node_ptr tmp = new Node(data, this);
+            ret.first = iterator(tmp);
+            ret.second = true;
+            return (tmp);
         }
         if (comp(key(root->data), key(data)))// data > root->data)//
         {
-            root->right = insert_util(root->right, data, &rotate);
+            root->right = insert_util(root->right, data, &rotate, ret);
             root->right->parent = root;
             if (root->color == RED && root->right->color == RED)
                 *rotation = fix_tree_r(root);
@@ -563,9 +563,8 @@ struct RBTree
                 return (do_right_rotate(root, rotate));
         }
         if (comp(key(data), key(root->data)))
-        // if (data < root->data)
         {
-            root->left = insert_util(root->left, data, &rotate);
+            root->left = insert_util(root->left, data, &rotate, ret);
             root->left->parent = root;
             if (root->color == RED && root->left->color == RED)
                 *rotation = fix_tree_l(root);
@@ -574,17 +573,144 @@ struct RBTree
         }
         return root;
     }
-    void insert(T data)
+
+	void fix_tree_rb_while(node_ptr node)
+	{
+		node_ptr uncle;
+		node_ptr tmp;
+
+		if (node == this->root)
+			node->be_black();
+		else if (node->parent->is_red())
+		{
+			uncle = get_sibling(node->parent);
+			if (uncle->is_red())
+			{
+				node->parent->be_black();
+				uncle->be_black();
+				node->parent->parent->be_red();
+				fix_tree_rb_while(node->parent->parent);
+			}
+			else
+			{
+				if (child_derection(node->parent) == LEFT)
+				{
+					tmp = node->parent->parent;
+					// std::cout << "++:::-:::++\n";
+					if(child_derection(node) == RIGHT)
+						rb_left_rotate(node->parent);
+					rb_right_rotate(tmp);
+					node->parent->recolor();
+					node->parent->right->recolor();
+				}
+				else
+				{
+					tmp = node->parent->parent;
+					// std::cout << "++::::::++\n";
+					if(child_derection(node) == LEFT)
+						rb_right_rotate(node->parent);
+					rb_left_rotate(tmp);
+					node->parent->recolor();
+					node->parent->left->recolor();
+				}
+			}
+		}
+	}
+
+	std::pair<iterator, bool> insert_while(iterator pos, type_name data)
+	{
+		node_ptr tmp;
+		node_ptr parent;
+		bool found = false;
+		node_ptr node;
+
+		tmp = pos.base();
+		parent = this->nil;
+		while (tmp != this->nil)
+		{
+			parent = tmp;
+			if (comp(key(tmp->data), key(data)))
+				tmp = tmp->right;
+			else if (comp(key(data), key(tmp->data)))
+				tmp = tmp->left;
+			else
+			{
+				found = true;
+				node = tmp;
+				break;
+			}
+		}
+		if (!found)
+		{
+			node = new Node(data, this);
+			if (parent == this->nil)
+			{
+				this->root = node;
+				root->be_black();
+				return std::pair<iterator, bool>(node, !found);
+				// return (iterator(node));
+			}
+			node->parent = parent;
+			if (comp(key(parent->data), key(data)))
+				parent->right = node;
+			if (comp(key(data), key(parent->data)))
+				parent->left = node;
+			fix_tree_rb_while(node);
+		}
+
+		return std::pair<iterator, bool>(node, !found);
+	}
+
+	std::pair<iterator, bool> insert(T data, char c)
+	{
+		char a;
+		a = c;
+		return (insert_while(root, data));
+	}
+	iterator insert(iterator pos, T data, char c)
+	{
+		char a;
+		a = c;
+		return (insert_while(pos, data).first);
+	}
+
+    std::pair<iterator, bool> insert(T data)
     {
+        std::pair<iterator, bool> ret;
+        ret.first = this->nil;
+        ret.second = false;
+
         if (this->root == this->nil)
         {
-            this->root = insert_util(root, data, 0);
+            this->root = insert_util(root, data, 0, ret);
             this->root->recolor();
         }
         else
         {
-            this->root = insert_util(this->root, data, 0);
+            this->root = insert_util(this->root, data, 0, ret);
         }
+        return ret;
+    }
+
+    std::pair<iterator, bool> insert(typename _get_key::key_type key)
+    {
+        std::pair<iterator, bool> ret;
+        type_name data(key, 0);
+
+        // data.first = key;
+        // data.second = my_allocator.construct();
+        ret.first = this->nil;
+        ret.second = false;
+        if (this->root == this->nil)
+        {
+            this->root = insert_util(root, data, 0, ret);
+            this->root->recolor();
+        }
+        else
+        {
+            this->root = insert_util(this->root, data, 0, ret);
+        }
+        return ret;
     }
 
     Node* find_max(Node* root) const
@@ -595,6 +721,8 @@ struct RBTree
     }
     Node *find_min(Node *root) const
     {
+		if (root == this->nil)
+			return (root);
         if (root->left == this->nil)
             return root;
         return (find_min(root->left));
@@ -662,7 +790,7 @@ struct RBTree
             {
                 std::cout << " "; 
             } 
-            std::cout << root->data;
+            std::cout << key(root->data);
             if (root->color == RED)
                 std::cout << 'r';
             else

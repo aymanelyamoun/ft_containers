@@ -55,6 +55,7 @@ namespace ft
 		typedef get_key_pairs<const key_type, value_type> _get_key_pairs;
 		typedef RBTree<value_type, _get_key_pairs, allocator_type, key_compare> RB_tree;
 		RB_tree tree;
+		size_type _size;
 		typedef typename RB_tree::node_ptr node_ptr;
 	public:
 		typedef typename RB_tree::iterator iterator;
@@ -67,10 +68,11 @@ namespace ft
 		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 		{ insert(first, last); }
 
-		map (const map& x): tree(x.tree){}
+		map (const map& x): tree(x.tree), _size(x._size){}
 
 		map& operator= (const map& x)
 		{
+			_size = x._size;
 			tree = x.tree;
 			return (*this);
 		}
@@ -89,22 +91,54 @@ namespace ft
 			return (tmp->data.second);
 		}
 
-		// mapped_type& operator[] (const key_type& k)
-		// {
-		// 	node_ptr tmp;
+		mapped_type& operator[] (const key_type& k)
+		{
+			iterator tmp;
 
-		// 	tmp = tree.find(k);
-		// 	if (tmp == tree.nil)
-		// 		tree.insert(k);
-		// 	tmp = tree.find(k);
-		// 	return (tmp->data.second);
-		// }
+			tmp = tree.find(k);
+			if (tmp == tree.nil)
+				return (tree.insert(k).first->second);
+			return (tmp->second);
+				// tree.insert(k);
+			// tmp = tree.find(k);
+		}
+
+		void print()
+		{
+			tree.printTree();
+		}
 		// ~map(){std::cout << "map c was called\n";//tree.~RBTree(); }
 
 		iterator begin() {return tree.begin();}
 		iterator end() {return tree.end();}
 		reverse_iterator rbegin() {return tree.rbegin();}
 		reverse_iterator rend() {return tree.rend();}
+
+
+		//capcity 
+		bool empty() const
+		{
+			return (tree.begin() == tree.end());
+		}
+
+		size_type size() const
+		{
+			return _size;
+		}
+
+		size_type max_size() const
+		{
+
+		}
+
+		//end capacity
+
+		void clear() {tree.free_tree();}
+
+		void swap( map& other )
+		{
+
+		}
 
 		template <class InputIterator>
 		void insert (InputIterator first, InputIterator last) { tree.insert(first, last); }
@@ -114,9 +148,19 @@ namespace ft
 
 		// }
 
-		void insert(value_type value)
+		std::pair<iterator, bool> insert(value_type value)
 		{
-			tree.insert(value);
+			return tree.insert(value);
+		}
+
+		// std::pair<iterator, bool> insert(value_type data, char c)
+		// {
+		// 	return (tree.insert(data, c));
+		// }
+
+		iterator insert(iterator pos, value_type data)
+		{
+			return (tree.insert(pos, data));
 		}
 		void delete_(value_type value)
 		{

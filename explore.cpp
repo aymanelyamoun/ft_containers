@@ -17,14 +17,16 @@ public:
 
 int main()
 {
-	// ft::map<int, int> m;
+	ft::map<int, int> m;
 	std::vector<std::pair<int, int> > v;
-	std::pair<int, int> p(10, 69);
+	std::pair<int, int> p(50, 69);
 	ft::map<int, int>::value_type value(p);
 	// value.first = 10;
 	// value.second = 10;
 	// for (int i =0; i < 10; i++)
 	int input;
+	ft::map<int, int>::iterator pos;
+	// pos = m.insert(p, 'a');
 	while(1)
 	{
 		std::cin >> input;
@@ -32,14 +34,17 @@ int main()
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
-			v.push_back(p);
-			// m.insert(p);
+			pos = m.insert(m.begin(), p, 'a');
+			// m.insert(p, 'a');
+			// v.push_back(p);
+			// pos = m.insert(pos,p);
+			m.print();
 		}
 		else if (input == 2)
 		{
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
-			// m.delete_(p);
+			m.delete_(p);
 		}
 		else if (input == 3)
 			break;
@@ -55,24 +60,24 @@ int main()
 	// {
 	// 	std::cout << e.what();
 	// };
-	ft::map<int, int> m(v.begin(), v.end());
-	ft::map<int, int> m2(m);
-	std::cout << "add aditional value\n";
-	std::cin >> input;
-	p = std::pair<const int, int>(input, input + 10);
-	m.insert(p);
-	m2 = m;
-	std::cout << "search for value\n";
-	std::cin >> input;
+	// ft::map<int, int> m(v.begin(), v.end());
+	// ft::map<int, int> m2(m);
+	// std::cout << "add aditional value\n";
+	// std::cin >> input;
+	// p = std::pair<const int, int>(input, input + 10);
+	// m.insert(p);
+	// m2 = m;
+	// std::cout << "search for value\n";
+	// std::cin >> input;
 	
-	int &me = m2.at(input);
-	me = 159;
+	// int &me = m2[input];
+	// me = 159;
 	// m.insert(v.begin(), v.end());
-	for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
-	{
+	// for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
+	// {
 		// m.insert(p);
-		std::cout << it->first << " " << it->second << std::endl;
-	}
+		// std::cout << it->first << " " << it->second << std::endl;
+	// }
 }
 
 // int main ()
