@@ -45,7 +45,7 @@ namespace ft
 			key_compare comp;
 			value_compare(key_compare c): comp(c) {}
 		public:
-			bool operator()(value_type &p1, value_type &p2)
+			bool operator()(const value_type &p1, const value_type &p2) const
 			{
 				return comp(p1.first, p2.first);
 			}
@@ -73,7 +73,8 @@ namespace ft
 		map& operator= (const map& x)
 		{
 			_size = x._size;
-			tree = x.tree;
+        	insert(tree.begin(), tree.end());
+			// tree = x.tree;
 			return (*this);
 		}
 
@@ -100,6 +101,11 @@ namespace ft
 		{
 			tree.printTree();
 		}
+
+    	void print_add()
+		{
+			tree.print_add();
+		}
 		// ~map(){std::cout << "map c was called\n";//tree.~RBTree(); }
 
 		/// iterators
@@ -125,7 +131,7 @@ namespace ft
 
 		size_type max_size() const
 		{
-
+			return tree.max_size();
 		}
 
 		//end capacity
@@ -153,15 +159,21 @@ namespace ft
 			return tree.erase(pos);
 		}
 
+		void swap( map& other )
+		{
+			tree.swap(other.tree);
+		}
+
 		size_type count( const key_type& key ) const
 		{
 			return (find(key) != end());
 		}
 
-		void delete_(value_type value)
-		{
-			tree.delete_(value);
-		}
+
+		// void delete_(value_type value)
+		// {
+		// 	tree.delete_(value);
+		// }
 
 		// modifiers end
 
@@ -173,21 +185,33 @@ namespace ft
 
 		iterator lower_bound( const key_type& key )
 		{
-			return tree.lower_bound();
+			return tree.lower_bound(key);
+		}
+		iterator upper_bound( const key_type& k )
+		{
+			return tree.upper_bound(k);
+		}
+
+    	std::pair<iterator,iterator> equal_range( const key_type& key )
+		{
+			return tree.equal_range(key);
 		}
 
 		// lookup end
-		// iterator insert (iterator position, const value_type& val)
-		// {
 
-		// }
+		// observers start
 
+		key_compare key_comp() const
+		{
+			return (key_compare());
+		}
 
-		// std::pair<iterator, bool> insert(value_type data, char c)
-		// {
-		// 	return (tree.insert(data, c));
-		// }
+		value_compare value_comp() const
+		{
+			return (value_compare(key_compare()));
+		}
 
+		// observers end
 	};
 }
 #endif

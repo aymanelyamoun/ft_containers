@@ -41,6 +41,10 @@ int main()
 		else if (input == 3)
 			break;
 	}
+	std::cin >> input;
+	std::cout << m.lower_bound(input)->first << std::endl;
+	std::cout << m.upper_bound(input)->first << std::endl;
+	std::cout << "++++\n";
 	for (std::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
 	{
 		std::cout << it->first << " " << it->second << std::endl;

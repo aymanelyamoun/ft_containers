@@ -10,24 +10,31 @@ class A
 {
 public:
   int a;
-  A(): a(100) {; std::cout << "A::A()" << std::endl; }
+//   A(): a(100) {; std::cout << "A::A()" << std::endl; }
   A(const A&) { std::cout << "A::A(const A&)" << std::endl; }
   ~A() { std::cout << "A::~A()" << std::endl; }
 };
 
+#include <cassert>
+#include <iostream>
+#include <map>
+ 
+// Example module 97 key compare function
+struct ModCmp {
+    bool operator()(const int lhs, const int rhs) const
+    {
+        return (lhs % 97) < (rhs % 97);
+    }
+};
+
 int main()
 {
-	ft::map<int, int> m;
-	std::vector<std::pair<int, int> > v;
+    ft::map<int, int> m;
+    std::map<int, int> m2;
 	std::pair<int, int> p(50, 69);
-	ft::map<int, int>::value_type value(p);
-	// value.first = 10;
-	// value.second = 10;
-	// for (int i =0; i < 10; i++)
-	int input;
-	ft::map<int, int>::iterator pos;
-	// pos = m.insert(p, 'a');
-	while(1)
+    int input;
+
+    while(1)
 	{
 		std::cin >> input;
 		if (input == 1)
@@ -35,19 +42,20 @@ int main()
 			std::cin >> input;
 			p = std::pair<const int, int>(input, input + 10);
 			// m.insert(p);
-			pos = m.insert(m.begin(), p);
+			m.insert(m.begin(), p);
 			// m.insert(p, 'a');
 			// v.push_back(p);
 			// pos = m.insert(pos,p);
-			m.print();
+			// m.print();
 		}
 		else if (input == 2)
 		{
 			for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
 			{
 				// m.insert(p);
-				std::cout << it->first << " " << it->second << std::endl;
+				std::cout << "( " << it->first << " " << it->second << " ) ";
 			}
+            std::cout << std::endl;
 			std::cin >> input;
 			std::cout << "next : " << m.erase(m.find(input))->first << std::endl;
 			// m.delete_(p);
@@ -55,40 +63,230 @@ int main()
 		else if (input == 3)
 			break;
 	}
-	// std::map<int, int> mm(v.begin(), v.end());
-	// std::cout << "search: ";
-	// int val;
-	std::cin >> input;
-	std::cout << m.count(input) << std::endl;
-	// std::cin >> val;
-	// m[input] = val;
-	// try
-	// {
-	// 	mm.at(input);
-	// }
-	// catch(std::exception &e)
-	// {
-	// 	std::cout << e.what();
-	// };
-	// ft::map<int, int> m(v.begin(), v.end());
-	// ft::map<int, int> m2(m);
-	// std::cout << "add aditional value\n";
-	// std::cin >> input;
-	// p = std::pair<const int, int>(input, input + 10);
-	// m.insert(p);
-	// m2 = m;
-	// std::cout << "search for value\n";
-	// std::cin >> input;
-	
-	// int &me = m2[input];
-	// me = 159;
-	// m.insert(v.begin(), v.end());
+
 	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
-	{
-		// m.insert(p);
-		std::cout << it->first << " " << it->second << std::endl;
-	}
+    {
+        // m.insert(p);
+        std::cout << "( " << it->first << " " << it->second << " )";
+    }
+
+	std::cout <<std::endl << "m  : " << m.max_size() << std::endl;
+	std::cout <<std::endl << "m2 : " << m2.max_size() << std::endl;
 }
+
+/* swap
+
+int main()
+{
+    ft::map<int, int> m;
+    ft::map<int, int> m2;
+	std::pair<int, int> p(50, 69);
+    int input;
+
+    while(1)
+	{
+		std::cin >> input;
+		if (input == 1)
+		{
+			std::cin >> input;
+			p = std::pair<const int, int>(input, input + 10);
+			// m.insert(p);
+			m.insert(m.begin(), p);
+			// m.insert(p, 'a');
+			// v.push_back(p);
+			// pos = m.insert(pos,p);
+			// m.print();
+		}
+		else if (input == 2)
+		{
+			for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+			{
+				// m.insert(p);
+				std::cout << "( " << it->first << " " << it->second << " ) ";
+			}
+            std::cout << std::endl;
+			std::cin >> input;
+			std::cout << "next : " << m.erase(m.find(input))->first << std::endl;
+			// m.delete_(p);
+		}
+		else if (input == 3)
+			break;
+	}
+    while(1)
+	{
+		std::cin >> input;
+		if (input == 1)
+		{
+			std::cin >> input;
+			p = std::pair<const int, int>(input, input + 10);
+			// m.insert(p);
+			m2.insert(m.begin(), p);
+			// m.insert(p, 'a');
+			// v.push_back(p);
+			// pos = m.insert(pos,p);
+			// m.print();
+		}
+		else if (input == 2)
+		{
+			for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
+			{
+				// m.insert(p);
+				std::cout << "( " << it->first << " " << it->second << " ) ";
+			}
+            std::cout << std::endl;
+			std::cin >> input;
+			std::cout << "next : " << m2.erase(m2.find(input))->first;
+			// m.delete_(p);
+		}
+		else if (input == 3)
+			break;
+	}
+    std::cout << "m  : ";
+    m.print_add();
+    std::cout << "m2 : ";
+    m2.print_add();
+
+    std::cout << "m  : ";
+    m.print_add();
+    std::cout << "m2 : ";
+    m2.print_add();
+    for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+    {
+        // m.insert(p);
+        std::cout << "( " << it->first << " " << it->second << " )";
+    }
+    std::cout << std::endl;
+    for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
+    {
+        // m.insert(p);
+        std::cout << "( " << it->first << " " << it->second << " ) ";
+	}
+    m.swap(m2);
+
+    std::cout << "m  : ";
+    m.print_add();
+    std::cout << "m2 : ";
+    m2.print_add();
+    for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+    {
+        // m.insert(p);
+        std::cout << "( " << it->first << " " << it->second << " )";
+    }
+    std::cout << std::endl;
+    for (ft::map<int, int>::iterator it = m2.begin(); it != m2.end(); it++)
+    {
+        // m.insert(p);
+        std::cout << "( " << it->first << " " << it->second << " ) ";
+    }
+}
+*/
+// int main()
+// {
+//     ft::map<int, char, ModCmp> cont;
+//     const std::pair<const int, char> p;
+//     // cont = { { 1, 'a' }, { 2, 'b' }, { 3, 'c' }, { 4, 'd' }, { 5, 'e' } };
+// 	cont.insert(std::pair<const int, char>(1, 'a'));
+// 	cont.insert(std::pair<const int, char>(2, 'b'));
+// 	cont.insert(std::pair<const int, char>(3, 'c'));
+
+//     ft::map<int, char, ModCmp>::value_compare comp_func = cont.value_comp();
+ 
+//     std::pair<const int, char> val( 100, 'a' );
+ 
+//     for (ft::map<int, char, ModCmp>::iterator it = cont.begin(); it != cont.end(); it++)
+// 	{
+//         bool before = comp_func(*it, val);
+//         bool after = comp_func(val, *it);
+ 
+//         std::cout << '(' << it->first << ',' << it->second;
+//         if (!before && !after)
+//             std::cout << ") equivalent to key " << val.first << '\n';
+//         else if (before)
+//             std::cout << ") goes before key " << val.first << '\n';
+//         else if (after)
+//             std::cout << ") goes after key " << val.first << '\n';
+//         else
+//             assert(0); // Cannot happen
+//     }
+// }
+
+// int main()
+// {
+// 	ft::map<int, int> m;
+// 	std::vector<std::pair<int, int> > v;
+// 	std::pair<int, int> p(50, 69);
+// 	ft::map<int, int>::value_type value(p);
+// 	// value.first = 10;
+// 	// value.second = 10;
+// 	// for (int i =0; i < 10; i++)
+// 	int input;
+// 	ft::map<int, int>::iterator pos;
+// 	// pos = m.insert(p, 'a');
+// 	while(1)
+// 	{
+// 		std::cin >> input;
+// 		if (input == 1)
+// 		{
+// 			std::cin >> input;
+// 			p = std::pair<const int, int>(input, input + 10);
+// 			// m.insert(p);
+// 			pos = m.insert(m.begin(), p);
+// 			// m.insert(p, 'a');
+// 			// v.push_back(p);
+// 			// pos = m.insert(pos,p);
+// 			m.print();
+// 		}
+// 		else if (input == 2)
+// 		{
+// 			for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+// 			{
+// 				// m.insert(p);
+// 				std::cout << it->first << " " << it->second << std::endl;
+// 			}
+// 			std::cin >> input;
+// 			std::cout << "next : " << m.erase(m.find(input))->first << std::endl;
+// 			// m.delete_(p);
+// 		}
+// 		else if (input == 3)
+// 			break;
+// 	}
+// 	// std::map<int, int> mm(v.begin(), v.end());
+// 	// std::cout << "search: ";
+// 	// int val;
+// 	std::cin >> input;
+// 	std::cout << m.lower_bound(input)->first << std::endl;
+// 	std::cout << m.upper_bound(input)->first << std::endl;
+// 	std::cout << m.equal_range(input).first->first << ' ' << m.equal_range(input).second->first << std::endl;
+// 	std::cout << "++++\n";
+// 	// std::cin >> val;
+// 	// m[input] = val;
+// 	// try
+// 	// {
+// 	// 	mm.at(input);
+// 	// }
+// 	// catch(std::exception &e)
+// 	// {
+// 	// 	std::cout << e.what();
+// 	// };
+// 	// ft::map<int, int> m(v.begin(), v.end());
+// 	// ft::map<int, int> m2(m);
+// 	// std::cout << "add aditional value\n";
+// 	// std::cin >> input;
+// 	// p = std::pair<const int, int>(input, input + 10);
+// 	// m.insert(p);
+// 	// m2 = m;
+// 	// std::cout << "search for value\n";
+// 	// std::cin >> input;
+	
+// 	// int &me = m2[input];
+// 	// me = 159;
+// 	// m.insert(v.begin(), v.end());
+// 	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+// 	{
+// 		// m.insert(p);
+// 		std::cout << it->first << " " << it->second << std::endl;
+// 	}
+// }
 
 // int main ()
 // {

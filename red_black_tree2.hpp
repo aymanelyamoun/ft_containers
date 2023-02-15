@@ -3,6 +3,7 @@
 #include <iostream>
 #include <functional>
 #include "iterator.hpp"
+#include <algorithm>
 
 #define RED true
 #define BLACK false
@@ -32,12 +33,13 @@ struct RBTree
         Node *left;
         Node *parent;
         bool color;
-		RBTree *nodes_tree;
+		Node *nil;
 
-        Node(T data, RBTree *tree): data(data), right(tree->nil), left(tree->nil), parent(tree->nil), color(RED){nodes_tree = tree;}
+        // Node(T data, RBTree *tree): data(data), right(tree->nil), left(tree->nil), parent(tree->nil), color(RED){nodes_tree = tree;}
+        Node(T data, Node *nil): data(data), right(nil), left(nil), parent(nil), color(RED){this->nil = nil;}
 
         Node(bool color): color(color), right(NULL), left(NULL), parent(NULL) {}
-        Node (const Node & obj):color(obj.color), right(obj.right), left(obj.left), parent(obj.parent), data(obj.data) {nodes_tree = obj.nodes_tree;}
+        Node (const Node & obj):color(obj.color), right(obj.right), left(obj.left), parent(obj.parent), data(obj.data) {nil = obj.nil;}
         void recolor() { color = !color;}
         void be_black() {color = BLACK;}
         void be_red() {color = RED;}
@@ -56,26 +58,26 @@ struct RBTree
         }
     // kdfj //
     Node* minimum(Node* node) const{
-    while (node->left != nodes_tree->nil) {
+    while (node->left != nil) {
       node = node->left;
     }
     return node;
   }
 
   Node* maximum(Node* node) const{
-    while (node->right != nodes_tree->nil) {
+    while (node->right != nil) {
       node = node->right;
     }
     return node;
   }
 
   Node* successor(Node* x) const {
-    if (x->right != nodes_tree->nil) {
+    if (x->right != nil) {
       return minimum(x->right);
     }
 
     Node* y = x->parent;
-    while (y != nodes_tree->nil && x == y->right) {
+    while (y != nil && x == y->right) {
       x = y;
       y = y->parent;
     }
@@ -83,12 +85,12 @@ struct RBTree
   }
 
   Node* predecessor(Node* x) const{
-    if (x->left != nodes_tree->nil) {
+    if (x->left != nil) {
       return maximum(x->left);
     }
 
     Node* y = x->parent;
-    while (y != nodes_tree->nil && x == y->left) {
+    while (y != nil && x == y->left) {
       x = y;
       y = y->parent;
     }
@@ -97,7 +99,7 @@ struct RBTree
   }
     // kdfj //
 
-        bool is_nil() { return (this == nodes_tree->nil); }
+        bool is_nil() { return (this == nil); }
 
         // int child_derection(Node *root)
         // {
@@ -114,42 +116,86 @@ struct RBTree
 
     };
 //aymane
-    typedef Node* node_ptr;
+    // typedef Node* node_ptr;
     typedef T type_name;
     typedef type_name& reference;
     typedef _Allocator allocator_type;
+	// typedef typename allocator_type::difference_type    difference_type;
+    typedef typename allocator_type::template rebind<Node>::other	allocator_node;
+    typedef typename allocator_node::value_type* node_ptr;
+	typedef typename allocator_node::difference_type    difference_type;
+
 
     typedef typename ft::RB_Tree_iterator<type_name, _get_key, allocator_type, compare> iterator;
     typedef typename ft::RB_Tree_reverse_iterator<type_name, _get_key, allocator_type, compare> reverse_iterator;
+
+    private:
+        difference_type size;
+    public:
     iterator __begin;
+    allocator_node alloc;
     Node	*nil;// = new Node(BLACK);
+    // RBTree **root_ptr = &this;
     Node	*root;
-    iterator begin() const{return (find_min(this->root));}
-    iterator end() const {return this->nil;}
+    iterator begin() const{return (iterator(find_min(this->root)));}
+    iterator end() const {return iterator(this->nil);}
     reverse_iterator rbegin() const {return (find_max(this->root));}
     reverse_iterator rend() const{return this->nil;}
 
-    RBTree() {nil = new Node(BLACK) ; root = nil;}
-    RBTree(const value_compare& __comp, const allocator_type& __a) {nil = new Node(BLACK) ; root = nil;}
-    RBTree(const RBTree& tree)
+    RBTree()
     {
-        nil = new Node(BLACK) ; root = nil;
-        insert(tree.begin(), tree.end());
-    }
-    ~RBTree()
-    {
-        // std::cout << "tree c was called\n";
-        free_tree();
-        // std::cout << "tree c is done\n";
-        
+        nil = alloc.allocate(1);
+        alloc.construct(nil, Node(BLACK));
+        // nil = new Node(BLACK);
+        root = nil;
+        size = 0;
     }
 
-    RBTree& operator=(const RBTree& tree)
+    RBTree(const value_compare& __comp, const allocator_type& __a)
     {
-        // if (*this != tree)
-            insert(tree.begin(), tree.end());
-        return (*this);
+        nil = alloc.allocate(1);
+        alloc.construct(nil, Node(BLACK));
+        // nil = new Node(BLACK) ;
+        root = nil;
+        size = 0;
     }
+
+    RBTree(const RBTree& tree)
+    {
+        nil = alloc.allocate(1);
+        alloc.construct(nil, Node(BLACK));
+        // nil = new Node(BLACK) ;
+        root = nil;
+        size = 0;
+        insert(tree.begin(), tree.end());
+    }
+
+    ~RBTree()
+    {
+        free_tree();
+    }
+
+    // typedef typename allocator_type::difference_type difference_type;
+    size_type max_size() const throw()
+    {
+        // std::cout << "max : " << alloc.max_size() << std::endl;
+        return std::min<unsigned long>(alloc.max_size(), std::numeric_limits<difference_type >::max());
+    }
+
+    void print_add()
+    {
+        std::cout << "begin: " << begin().base() << " root: " << this->root << " nil: " << this->nil << " end: " << end().base() << std::endl;
+    }
+
+    // RBTree& operator=(const RBTree& tree)
+    // {
+    //     // if (*this != tree)
+    //         // insert(tree.begin(), tree.end());
+    //     root = tree.root;
+    //     nil = tree.nil;
+
+    //     return (*this);
+    // }
 
     allocator_type get_allocator() const
     {
@@ -197,10 +243,10 @@ struct RBTree
 
     iterator find(iterator pos, node_ptr *parent, key_type value) const
     {
-        std::cout << "entered to the find with pos: \n";
+        // std::cout << "entered to the find with pos: \n";
         if (pos == end() || comp(value, key(*pos)))
         {
-            std::cout << "struck in 1\n";
+            // std::cout << "struck in 1\n";
             iterator prior = pos;
             if (pos == begin() || comp(key(*(--prior)), value))
             {
@@ -219,7 +265,7 @@ struct RBTree
         }
         else if (comp(key(*pos), value))
         {
-            std::cout << "struck in 2\n";
+            // std::cout << "struck in 2\n";
             iterator next = pos;
             if (next == end() || comp(value, key(*(++next))))
             {
@@ -236,9 +282,54 @@ struct RBTree
             }
             return (find(parent, value));
         }
-        std::cout << "got out from the find with pos: \n";
+        // std::cout << "got out from the find with pos: \n";
         *parent = pos.base();
         return pos.base();
+    }
+
+    iterator lower_bound( const key_type& k )
+    {
+        node_ptr tmp;
+        node_ptr ret;
+
+        tmp = root;
+        ret = this->nil;
+        while (tmp != this->nil)
+        {
+            if (!comp(key(tmp->data), k))
+            {
+                ret = tmp;
+                tmp = tmp->left;
+            }
+            else
+                tmp = tmp->right;
+        }
+        return (iterator(ret));
+    }
+
+    iterator upper_bound( const key_type& k )
+    {
+        node_ptr tmp;
+        node_ptr ret;
+
+        tmp = root;
+        ret = this->nil;
+        while (tmp != this->nil)
+        {
+            if (comp(k, key(tmp->data)))
+            {
+                ret = tmp;
+                tmp = tmp->left;
+            }
+            else
+                tmp = tmp->right;
+        }
+        return (iterator(ret));
+    }
+
+    std::pair<iterator,iterator> equal_range( const key_type& key )
+    {
+        return (std::pair<iterator, iterator> (lower_bound(key), upper_bound(key)));
     }
 
     void free_tree()
@@ -516,7 +607,9 @@ struct RBTree
             sibling = get_sibling(tmp2);
             parent = tmp2->parent;
             db = tmp2->right;
-            Node *replace = new Node(*tmp);
+            node_ptr replace = alloc.allocate(1);
+            alloc.construct(replace, Node(replace)); 
+            // Node *replace = new Node(*tmp);
             assign_with_p(tmp, replace);
             transplant(tmp2, tmp2->right);
             if (tmp2->is_black() && db->is_black())
@@ -616,7 +709,9 @@ struct RBTree
 
         if (root == this->nil)
         {
-            node_ptr tmp = new Node(data, this);
+            node_ptr tmp = alloc.allocate(1);
+            alloc.construct(Node(data, this->nil));
+            // node_ptr tmp = new Node(data, this->nil);
             ret.first = iterator(tmp);
             ret.second = true;
             return (tmp);
@@ -700,8 +795,10 @@ struct RBTree
 
 		if (!found)
 		{
-        std::cout << "struck out\n";
-			node = new Node(data, this);
+        // std::cout << "struck out\n";
+            node_ptr node = alloc.allocate(1);
+            alloc.construct(node, Node(data, this->nil));
+			// node = new Node(data, this->nil);
 			if (parent == this->nil)
 			{
 				this->root = node;
@@ -747,6 +844,18 @@ struct RBTree
         return ret;
     }
 
+    void swap(RBTree &tree)
+    {
+		std::swap(root, tree.root);
+        std::swap(nil, tree.nil);
+        std::swap(alloc, tree.alloc);
+        std::swap(comp, tree.comp);
+
+		// std::swap<node_ptr>(root, tree.root);
+        // std::swap<allocator_type>(alloc, tree.alloc);
+        // std::swap<value_compare>(comp, tree.comp);
+    }
+
     // std::pair<iterator, bool> insert(key_type key)
     // {
     //     std::pair<iterator, bool> ret;
@@ -789,9 +898,9 @@ struct RBTree
 	    Node *tmp;
 
         tmp = pos.base();
-		std::cout << "pos" << pos->first << std::endl;
+		// std::cout << "pos" << pos->first << std::endl;
 		++pos;
-		std::cout << "ret" << pos->first << std::endl;
+		// std::cout << "ret" << pos->first << std::endl;
 
         // while (tmp != this->nil)
         // {
