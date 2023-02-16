@@ -5,6 +5,7 @@
 // #include "vector.hpp"
 #include <stack>
 #include <map>
+#include "pair.hpp"
 
 class A
 {
@@ -26,7 +27,75 @@ struct ModCmp {
         return (lhs % 97) < (rhs % 97);
     }
 };
+#include <iostream>
+#include <map>
 
+// int main() {
+//     ft::map<std::string, int> my_map;
+//     my_map["foo"] = 42;
+//     my_map["bar"] = 1337;
+//     my_map["baz"] = 3;
+
+//     // Find the iterator to the element with key "bar"
+//     ft::map<std::string, int>::const_iterator it = my_map.find("bar");
+
+//     if (it != my_map.end()) {
+//         std::cout << "Found the element with key 'bar' and value " << it->second << std::endl;
+//     } else {
+//         std::cout << "Could not find the element with key 'bar'" << std::endl;
+//     }
+
+//     return 0;
+// }
+
+
+int main()
+{
+	ft::map<int, int> m;
+	std::pair<int, int> p(50, 69);
+    int input;
+
+	while(1)
+	{
+		std::cin >> input;
+		if (input == 1)
+		{
+			std::cin >> input;
+			p = std::pair<const int, int>(input, input + 10);
+			// m.insert(p);
+			m.insert(m.begin(), p);
+			// m.insert(p, 'a');
+			// v.push_back(p);
+			// pos = m.insert(pos,p);
+			// m.print();
+		}
+		else if (input == 2)
+		{
+			for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); it++)
+			{
+				// m.insert(p);
+				std::cout << "( " << it->first << " " << it->second << " ) ";
+			}
+            std::cout << std::endl;
+			std::cin >> input;
+			// std::cout << "next : " << m.erase(m.find(input))->first << std::endl;
+			// m.delete_(p);
+		}
+		else if (input == 3)
+			break;
+	}
+	std::cin >> input;
+
+	ft::map<int, int>::const_iterator it = m.find(input);
+	std::cout << it->first << it->second;
+	for (ft::map<int, int>::const_iterator it = m.begin(); it != m.end(); it++)
+    {
+        // m.insert(p);
+		// it->second = 100;
+        std::cout << "( " << it->first << " " << it->second << " )";
+    }
+}
+/*
 int main()
 {
     ft::map<int, int> m;
@@ -73,7 +142,7 @@ int main()
 	std::cout <<std::endl << "m  : " << m.max_size() << std::endl;
 	std::cout <<std::endl << "m2 : " << m2.max_size() << std::endl;
 }
-
+*/
 /* swap
 
 int main()

@@ -1,4 +1,4 @@
-
+#pragma once
 namespace ft
 {
     template< class T1, class T2 >
@@ -11,6 +11,8 @@ namespace ft
         second_type second;
 
         pair();
+        // template<class U, class V>
+        pair(const first_type f, second_type s): first(f), second(s) {}
         template<class U, class V>
         pair (const pair<U,V>& pr): first(pr.first), second(pr.second) {}
         pair& operator= (const pair& pr)
@@ -27,11 +29,11 @@ namespace ft
 
     template <class T1, class T2>
     bool operator!= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-    {return !(lsh == rhs);}
+    {return !(lhs == rhs);}
 
     template <class T1, class T2>
     bool operator<  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-    {return (lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second))}
+    {return (lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second));}
 
     template <class T1, class T2>
     bool operator<= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
@@ -48,6 +50,6 @@ namespace ft
     template <class T1, class T2>
     bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
     {
-        return (!(lhs < rhs))
+        return (!(lhs < rhs));
     }
 }
