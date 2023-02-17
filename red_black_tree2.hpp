@@ -4,6 +4,7 @@
 #include <functional>
 #include "iterator.hpp"
 #include <algorithm>
+#include "pair.hpp"
 
 #define RED true
 #define BLACK false
@@ -348,9 +349,9 @@ struct RBTree
     }
 
     // typedef typename allocator_type::difference_type difference_type;
-    size_type size()
+    size_type size() const
     {
-        return size;
+        return _size;
     }
 
     size_type max_size() const throw()
@@ -525,9 +526,9 @@ struct RBTree
         return (iterator(ret));
     }
 
-    std::pair<iterator,iterator> equal_range( const key_type& key )
+    ft::pair<iterator,iterator> equal_range( const key_type& key )
     {
-        return (std::pair<iterator, iterator> (lower_bound(key), upper_bound(key)));
+        return (ft::pair<iterator, iterator> (lower_bound(key), upper_bound(key)));
     }
 
     void free_tree()
@@ -764,6 +765,8 @@ struct RBTree
         Node *db;
 
         tmp = tree_node;
+        if (tmp != tmp->nil)
+            _size--;
         if (tmp->left == this->nil && tmp->right == this->nil)
         {
             sibling = get_sibling(tmp);
@@ -901,7 +904,7 @@ struct RBTree
         return (tmp);
     }
 
-    Node *insert_util(Node *root, T data, int *rotation, std::pair<iterator, bool> &ret)
+    Node *insert_util(Node *root, T data, int *rotation, ft::pair<iterator, bool> &ret)
     {
         int rotate = 0;
 
@@ -979,7 +982,7 @@ struct RBTree
 		}
 	}
 
-	std::pair<iterator, bool> insert_while(iterator pos, value_type data)
+	ft::pair<iterator, bool> insert_while(iterator pos, value_type data)
 	{
 		node_ptr tmp;
 		node_ptr parent;
@@ -1004,7 +1007,7 @@ struct RBTree
 			{
 				this->root = node;
 				root->be_black();
-				return std::pair<iterator, bool>(node, !found);
+				return ft::pair<iterator, bool>(node, !found);
 				// return (iterator(node));
 			}
 			node->parent = parent;
@@ -1015,7 +1018,7 @@ struct RBTree
 			fix_tree_rb_while(node);
 		}
 
-		return std::pair<iterator, bool>(node, !found);
+		return ft::pair<iterator, bool>(node, !found);
 	}
 
 	// std::pair<iterator, bool> insert(T data)
@@ -1027,9 +1030,9 @@ struct RBTree
 		return (insert_while(pos, data).first);
 	}
 
-    std::pair<iterator, bool> insert(T data)
+    ft::pair<iterator, bool> insert(T data)
     {
-        std::pair<iterator, bool> ret;
+        ft::pair<iterator, bool> ret;
         ret.first = this->nil;
         ret.second = false;
 
@@ -1099,22 +1102,8 @@ struct RBTree
 	    Node *tmp;
 
         tmp = pos.base();
-		// std::cout << "pos" << pos->first << std::endl;
 		++pos;
-		// std::cout << "ret" << pos->first << std::endl;
-
-        // while (tmp != this->nil)
-        // {
-        //     if (comp(key(tmp->data), key(data)))// tmp->data < data)
-        //         tmp = tmp->right;
-        //     else if (comp(key(data), key(tmp->data)))// tmp->data > data)
-        //         tmp = tmp->left;
-            // else
-            // {
         delete_node(tmp);
-                // break;
-            // }
-        // }
 		return pos;
 	}
 
@@ -1142,6 +1131,7 @@ struct RBTree
             else
             {
 				found = 1;
+                _size--;
                 delete_node(tmp);
                 break;
             }
@@ -1264,11 +1254,4 @@ struct RBTree
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// fix the rotation to only rotate when on the parent and not inside the child it causes problems with the parent children ///
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/// add LEFT and RIGHT to check the rotation in the parent
 #endif

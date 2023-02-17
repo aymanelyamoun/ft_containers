@@ -14,19 +14,19 @@ namespace ft
 		typedef T value_type;
 		typedef key key_type;
 
-		key operator()(const value_type &p1) const
+		key_type operator()(const value_type &p1) const
 		{
 			return p1.first;
 		}
 	};
 
-	template <class _Key, class _Tp, class _Compare = std::less<_Key>, class _Allocator = std::allocator<std::pair<const _Key, _Tp> > >
+	template <class _Key, class _Tp, class _Compare = std::less<_Key>, class _Allocator = std::allocator<ft::pair<const _Key, _Tp> > >
 	class map
 	{
 	public:
 		typedef _Key                                        key_type;
 		typedef _Tp                                         mapped_type;
-		typedef std::pair<const key_type, mapped_type>      value_type;
+		typedef ft::pair<const key_type, mapped_type>      value_type;
 		typedef _Compare                                    key_compare;
 		typedef _Allocator                                  allocator_type;
 		typedef value_type&                                 reference;
@@ -87,7 +87,7 @@ namespace ft
 		mapped_type &at(key_type value)
 		{
 			node_ptr tmp;
-			tmp = tree.find(value);
+			tmp = tree.find(value).base();
 			if (tmp == tree.nil)
 				throw std::out_of_range("map::at:  key not foundadd aditional value");
 			return (tmp->data.second);
@@ -145,7 +145,7 @@ namespace ft
 
 		void clear() {tree.free_tree();}
 
-		std::pair<iterator, bool> insert(const value_type& value)
+		ft::pair<iterator, bool> insert(const value_type& value)
 		{
 			return tree.insert(value);
 		}
@@ -213,12 +213,12 @@ namespace ft
 			return tree.upper_bound(k);
 		}
 
-    	std::pair<iterator,iterator> equal_range( const key_type& key )
+    	ft::pair<iterator,iterator> equal_range( const key_type& key )
 		{
 			return tree.equal_range(key);
 		}
 
-    	std::pair<const_iterator,const_iterator> equal_range( const key_type& key ) const
+    	ft::pair<const_iterator,const_iterator> equal_range( const key_type& key ) const
 		{
 			return tree.equal_range(key);
 		}

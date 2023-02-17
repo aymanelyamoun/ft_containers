@@ -10,9 +10,8 @@ namespace ft
         first_type first;
         second_type second;
 
-        pair();
-        // template<class U, class V>
-        pair(const first_type f, second_type s): first(f), second(s) {}
+        pair(): first(), second() {}
+        pair( const T1& f, const T2& s ): first(f), second(s) {}
         template<class U, class V>
         pair (const pair<U,V>& pr): first(pr.first), second(pr.second) {}
         pair& operator= (const pair& pr)
@@ -51,5 +50,11 @@ namespace ft
     bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
     {
         return (!(lhs < rhs));
+    }
+
+    template< class T1, class T2 >
+    ft::pair<T1, T2> make_pair( T1 t, T2 u )
+    {
+        return ft::pair<T1, T2>(t, u);
     }
 }

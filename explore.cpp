@@ -4,8 +4,8 @@
 #include <iostream>
 // #include "vector.hpp"
 #include <stack>
+// #include "pair.hpp"
 #include <map>
-#include "pair.hpp"
 
 class A
 {
@@ -48,11 +48,52 @@ struct ModCmp {
 //     return 0;
 // }
 
+#include <iostream>
 
+int main() {
+    ft::map<int, std::string, std::greater<int> > my_map;
+    // create and populate your map with some values
+
+    // test the various member functions of std::map / ft::map
+    my_map.clear();
+    my_map.insert(ft::make_pair(1, "one"));
+    my_map.insert(ft::make_pair(2, "two"));
+    my_map.insert(ft::make_pair(3, "three"));
+    my_map.insert(ft::make_pair(4, "four"));
+    my_map.insert(ft::make_pair(5, "five"));
+
+    std::cout << "size: " << my_map.size() << std::endl;
+
+    std::cout << "empty: " << my_map.empty() << std::endl;
+
+    std::cout << "contains 3: " << my_map.count(3) << std::endl;
+
+    std::cout << "at 3: " << my_map.at(3) << std::endl;
+
+    ft::map<int, std::string>::iterator it;
+
+	it = my_map.upper_bound(3);
+    std::cout << "lower_bound 3: " << my_map.lower_bound(3)->second << std::endl;
+
+    std::cout << "upper_bound 3: " << it->second << std::endl;
+
+	my_map.erase(my_map.find(3));
+
+    std::cout << "size: " << my_map.size() << std::endl;
+
+    my_map.clear();
+    std::cout << "size: " << my_map.size() << std::endl;
+
+    return 0;
+}
+
+
+
+/*
 int main()
 {
 	ft::map<int, int> m;
-	std::pair<int, int> p(50, 69);
+	ft::pair<int, int> p(50, 69);
     int input;
 
 	while(1)
@@ -61,7 +102,7 @@ int main()
 		if (input == 1)
 		{
 			std::cin >> input;
-			p = std::pair<const int, int>(input, input + 10);
+			p = ft::pair<const int, int>(input, input + 10);
 			// m.insert(p);
 			m.insert(m.begin(), p);
 			// m.insert(p, 'a');
@@ -95,6 +136,8 @@ int main()
         std::cout << "( " << it->first << " " << it->second << " )";
     }
 }
+*/
+
 /*
 int main()
 {
