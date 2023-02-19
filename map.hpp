@@ -61,11 +61,12 @@ namespace ft
 		typedef typename RB_tree::const_iterator const_iterator;
 		typedef typename RB_tree::reverse_iterator reverse_iterator;
 
-		explicit map (const key_compare& _comp = key_compare(), const allocator_type& alloc = allocator_type())
+		map() : tree(key_comp()) {}
+		explicit map (const key_compare& _comp, const allocator_type& alloc = allocator_type())
 		: tree(key_compare(_comp), allocator_type(alloc)) {}
 
 		template <class InputIterator>
-		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : tree(key_comp())
 		{ insert(first, last); }
 
 		map (const map& x): tree(x.tree){}
@@ -161,6 +162,14 @@ namespace ft
 		iterator erase( iterator pos )
 		{
 			return tree.erase(pos);
+		}
+		iterator erase( iterator first, iterator last )
+		{
+			return tree.erase(first, last);
+		}
+		size_type erase( const key_type& key )
+		{
+			return tree.erase(key);
 		}
 
 		//forgot erase with range and erase with key
