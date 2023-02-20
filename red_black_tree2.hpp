@@ -376,7 +376,7 @@ struct RBTree
 
 
     iterator begin() {return (find_min(root));}
-    iterator end() {;return (nil);}
+    iterator end() {return (nil);}
 
     const_iterator begin() const {return (const_iterator(find_min(root)));}
     const_iterator end() const {return const_iterator(nil);}
@@ -415,6 +415,8 @@ struct RBTree
     ~RBTree()
     {
         free_tree();
+        alloc.destroy(nil);
+        alloc.deallocate(nil, 1);
     }
 
     // typedef typename allocator_type::difference_type difference_type;
@@ -497,10 +499,10 @@ struct RBTree
         while (tmp != this->nil)
         {
             *parent = tmp;
-            if (comp(key(tmp->data), value))// tmp->data < data)
-                tmp = tmp->right;
-            else if (comp(value, key(tmp->data)))
+            if (comp(value, key(tmp->data)))
                 tmp = tmp->left;
+            else if (comp(key(tmp->data), value))// tmp->data < data)
+                tmp = tmp->right;
             else
             {
                 break;
@@ -516,10 +518,12 @@ struct RBTree
         {
             // std::cout << "struck in 1\n";
             const_iterator prior = pos;
-            if (pos == begin() || comp(key(*(--prior)), value))
+            if ((pos == begin() || comp(key(*(--prior)), value)) && prior != end())
             {
+                std::cout << "prior: " << prior->first << std::endl;
                 if (pos.base()->left == this->nil)
                 {
+                    std::cout << "value: " << value << std::endl;
                     *parent = pos.base();
                     return (this->nil);
                 }
@@ -529,11 +533,11 @@ struct RBTree
                     return (prior.base()->right);
                 }
             }
+            std::cout << "got to normal find\n";
             return (find(parent, value));
         }
         else if (comp(key(*pos), value))
         {
-            // std::cout << "struck in 2\n";
             const_iterator next = pos;
             if (next == end() || comp(value, key(*(++next))))
             {
@@ -548,6 +552,7 @@ struct RBTree
                     return next.base()->left;
                 }
             }
+            std::cout << "got to normal find\n";
             return (find(parent, value));
         }
         // std::cout << "got out from the find with pos: \n";
@@ -894,8 +899,10 @@ struct RBTree
             transplant(tmp, this->nil);
             if (tmp->is_black())
                 fix_db(parent, db, sibling);
-            delete tmp;
-            tmp = this->nil;
+            // alloc.destroy(tmp);
+            // alloc.deallocate(tmp, 1);
+            // delete tmp;
+            // tmp = this->nil;
         }
         else if (tmp->left != this->nil && tmp->right == this->nil)
         {
@@ -906,8 +913,8 @@ struct RBTree
             if (tmp->left->is_black() && tmp->is_black())
                 fix_db(parent, db, sibling);
             else tmp->left->be_black();
-            delete tmp;
-            tmp = this->nil;
+            // delete tmp;
+            // tmp = this->nil;
         }
         else if (tmp->left == this->nil && tmp->right != this->nil)
         {
@@ -918,8 +925,8 @@ struct RBTree
             if (tmp->right->is_black() && tmp->is_black())
                 fix_db(parent, db, sibling);
             else tmp->right->be_black();
-            delete tmp;
-            tmp = this->nil;
+            // delete tmp;
+            // tmp = this->nil;
         }
         else
         {
@@ -935,10 +942,15 @@ struct RBTree
             if (tmp2->is_black() && db->is_black())
                 fix_db(parent, db, sibling);
             else tmp2->right->be_black();
-            delete tmp2;
-            delete tmp;
-            tmp2 = this->nil;
+
+            alloc.destroy(tmp2);
+            alloc.deallocate(tmp2, 1);
+            // delete tmp2;
+            // delete tmp;
+            // tmp2 = this->nil;
         }
+        alloc.destroy(tmp);
+        alloc.deallocate(tmp, 1);
     }
 
     int get_rotate_direction_l(Node *node)
@@ -1122,72 +1134,51 @@ struct RBTree
 		node_ptr node;
 
 		parent = this->nil;
-        node = find(pos, &parent, key(data));
+        if (pos != nil)
+            node = find(pos, &parent, key(data));
+        else
+            node = find(&parent, key(data));
         // node = find(pos, &parent, key(data)).base();
         
         if (node == this->nil || root == this->nil)
             found = false;
-
 		if (!found)
 		{
-        // std::cout << "struck out\n";
             node = alloc.allocate(1);
             alloc.construct(node, Node(data, this->nil));
-            // std::cout << "node: " << node->color <<  " left: " << (node->left == node->nil) << " right: " << (node->right == node->nil) << " nil: " << node->nil->color << std::endl;
             _size++;
-			// node = new Node(data, this->nil);
 			if (parent == this->nil)
 			{
 				this->root = node;
 				root->be_black();
                 nil->parent = root;
 				return ft::pair<iterator, bool>(node, !found);
-				// return (iterator(node));
 			}
 			node->parent = parent;
-			if (comp(key(parent->data), key(data)))
-				parent->right = node;
 			if (comp(key(data), key(parent->data)))
+            {
 				parent->left = node;
+            }
+			else if (comp(key(parent->data), key(data)))
+            {
+				parent->right = node;
+            }
+
 			fix_tree_rb_while(node);
 		}
-
         nil->parent = root;
 		return ft::pair<iterator, bool>(node, !found);
 	}
 
-	// std::pair<iterator, bool> insert(T data)
-	// {
-	// 	return (insert_while(root, data));
-	// }
 	iterator insert(iterator pos, T data)
 	{
 		return (insert_while(pos, data).first);
 	}
-    
-	// iterator insert(iterator pos, T data)
-	// {
-	// 	return (insert_while(pos, data).first);
-	// }
 
     ft::pair<iterator, bool> insert(T data)
     {
-        // ft::pair<iterator, bool> ret;
-        // ret.first = this->nil;
-        // ret.second = false;
 
-        // if (this->root == this->nil)
-        // {
-        //     this->root = insert_util(root, data, 0, ret);
-        //     this->root->recolor();
-        // }
-        // else
-        // {
-        //     this->root = insert_util(this->root, data, 0, ret);
-        // }
-        // return ret;
-        // std::cout << key(data) << std::endl;
-        return insert_while(this->root, data);
+        return insert_while(this->nil, data);
     }
 
     void swap(RBTree &tree)
@@ -1318,7 +1309,7 @@ struct RBTree
     void printTreeHelper(Node *root, int space)
     {
         int i;
-        if(root != NULL)
+        if(root != this->nil)
         {
             space = space + 10;
             printTreeHelper(root->right, space); 
@@ -1327,15 +1318,14 @@ struct RBTree
             {
                 std::cout << " "; 
             }
-            if (root != this->nil){
             std::cout << key(root->data);
                 
             if (root->color == RED)
                 std::cout << 'r';
             else
-                std::cout << 'b';}
-            else
-                std::cout << "nil";
+                std::cout << 'b';
+            // else
+                // std::cout << "nil";
             std::cout << std::endl; 
             printTreeHelper(root->left, space); 
         }
