@@ -99,15 +99,15 @@ namespace ft
 			return (tree.insert(value_type(k, mapped_type())).first->second);
 		}
 
-		void print()
-		{
-			tree.printTree();
-		}
+		// void print()
+		// {
+		// 	tree.printTree();
+		// }
 
-    	void print_add()
-		{
-			tree.print_add();
-		}
+    	// void print_add()
+		// {
+		// 	tree.print_add();
+		// }
 		// ~map(){std::cout << "map c was called\n";//tree.~RBTree(); }
 
 		/// iterators
@@ -163,36 +163,31 @@ namespace ft
 		{
 			return tree.erase(pos);
 		}
+
 		iterator erase( iterator first, iterator last )
 		{
 			return tree.erase(first, last);
 		}
+
 		size_type erase( const key_type& key )
 		{
 			return tree.erase(key);
 		}
-
-		//forgot erase with range and erase with key
 
 		void swap( map& other )
 		{
 			tree.swap(other.tree);
 		}
 
+		// modifiers end
+
+		// lookup
+
 		size_type count( const key_type& key ) const
 		{
 			return (find(key) != end());
 		}
 
-
-		// void delete_(value_type value)
-		// {
-		// 	tree.delete_(value);
-		// }
-
-		// modifiers end
-
-		// lookup
 		iterator find( const key_type& key )
 		{
 			// std::cout << "iter\n";

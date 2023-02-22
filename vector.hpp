@@ -13,6 +13,7 @@
 #pragma once
 #include <iostream>
 #include <memory>
+#include <algorithm>
 #include "iterator.hpp"
 #include "type_trait.hpp"
 #include "equality.hpp"
@@ -76,7 +77,7 @@ namespace ft{
             template <class InputIterator>
             // vector (enable_if<!is_integral<InputIterator>::value, InputIterator>::type)
             // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
-            vector (typename enable_if<!is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last, const allocator_type& alloc = allocator_type())
+            vector (typename ft::enable_if<!is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last, const allocator_type& alloc = allocator_type())
             {
                 __size = 0;
                 __capacity = 0;
@@ -106,11 +107,88 @@ namespace ft{
                 }
                 return (*this);
             }
-            // void assign( size_type n, const value_type& value )
+            
+            size_type recomended_size(size_type new_size)
+            {
+                size_type ms = max_size();
+                if (new_size > ms)
+                    std::__throw_length_error("vector");
+                if (__capacity >= ms / 2)
+                    return (ms);
+                else
+                    return std::max(new_size, __capacity * 2);
+            }
 
+            void assign( size_type n, const value_type& value )
+            {
+                if (n > 0)
+                {
+                    __size = 0;
+                    if (n < __capacity)
+                    {
+                        __size = n;
+                    }
+                    else
+                    {
+                        vector v;
+                        v.reserve(recomended_size(n));
+                        v.__size = n;
+                        swap(v);
+                    }
+                    push_back(value);
+                    // std::fill_n(this->begin(), n, value);
+                }
+            }
 
             template< class InputIt >
-            void assign( InputIt first, InputIt last );
+            typename ft::enable_if<std::__is_input_iterator<InputIt>::value, void >::type
+            assign( InputIt first, InputIt last)
+            {
+                clear();
+                difference_type new_size = ft::distance(first, last);
+                size_type n = static_cast<size_type>(new_size);
+                if (n > 0)
+                {
+                    if (n > __capacity)
+                    {
+                        myAllocator.deallocate(arr, __capacity);
+                        arr = myAllocator.allocate(recomended_size(n));
+                    }
+                    for (;first != last; first++)
+                        push_back(*first);
+                }
+            }
+
+            // void assign( size_type n, const value_type& value )
+            // {
+            //     if (n <= __capacity)
+            //     {
+            //         std::fill_n(this->begin(), std::min(n, __size), value)
+            //         if (n < __size)
+            //         {
+            //             for(size_type pos = n; pos <= __size; pos++)
+            //                 myAllocator.destroy(&arr[pos])
+            //         }
+            //         else
+            //         {
+            //             for(s = __size; s <= n; s++)
+            //                 myAllocator.construct(&arr[s], value)
+            //         }
+            //     }
+            //     else
+            //     {
+            //         clear();
+            //         myAllocator.deallocate(arr, __capacity);
+            //         arr = myAllocator.allocate(recomended_size(n));
+            //         for(s = __size; s <= n; s++)
+            //                 myAllocator.construct(&arr[s], value)
+            //     }
+            //     size = n;
+            // }
+
+
+            // template< class InputIt >
+            // void assign( InputIt first, InputIt last );
 
             allocator_type get_allocator() const
             {
@@ -181,10 +259,10 @@ namespace ft{
 
             size_type size() const {return (__size);}
 
-            // size_type max_size() const 
-            // {
-            //     return std::numeric_limits<difference_type>::max();
-            // }
+            size_type max_size() const 
+            {
+                return std::min<unsigned long>(myAllocator.max_size(), std::numeric_limits<difference_type >::max());
+            }
 
             void reserve( size_type new_cap )
             {
@@ -223,10 +301,10 @@ namespace ft{
                 {
                     for (size_type i = 0; i < __size; i++)
                         myAllocator.destroy(&arr[i]);
-                    myAllocator.deallocate(arr, __capacity);
+                    // myAllocator.deallocate(arr, __capacity);
                 }
                 __size = 0;
-                __capacity = 0;
+                // __capacity = 0;
             }
 
             // void insert (iterator position, size_type n, const value_type& x)
