@@ -291,11 +291,15 @@ struct RBTree;
 
 
 
-template <typename T>
+template <typename key>
 struct get_key
 {
-    typedef T key_type;
-    T operator()(const T &value) {return value;}
+    typedef key key_type;
+
+    key_type operator()(const key_type &p) const
+    {
+        return p;
+    }
 };
 
 
@@ -520,10 +524,10 @@ struct RBTree
             const_iterator prior = pos;
             if ((pos == begin() || comp(key(*(--prior)), value)) && prior != end())
             {
-                std::cout << "prior: " << prior->first << std::endl;
+                // std::cout << "prior: " << prior->first << std::endl;
                 if (pos.base()->left == this->nil)
                 {
-                    std::cout << "value: " << value << std::endl;
+                    // std::cout << "value: " << value << std::endl;
                     *parent = pos.base();
                     return (this->nil);
                 }
@@ -533,7 +537,7 @@ struct RBTree
                     return (prior.base()->right);
                 }
             }
-            std::cout << "got to normal find\n";
+            // std::cout << "got to normal find\n";
             return (find(parent, value));
         }
         else if (comp(key(*pos), value))
@@ -552,7 +556,7 @@ struct RBTree
                     return next.base()->left;
                 }
             }
-            std::cout << "got to normal find\n";
+            // std::cout << "got to normal find\n";
             return (find(parent, value));
         }
         // std::cout << "got out from the find with pos: \n";

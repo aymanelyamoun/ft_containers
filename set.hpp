@@ -5,25 +5,13 @@
 #include "red_black_tree2.hpp"
 #include "equality.hpp"
 
-namespace ft
-{
+namespace ft{
 
-	template<typename key, typename T>
-	struct get_key_pairs
-	{
-		typedef T value_type;
-		typedef key key_type;
-
-		key_type operator()(const value_type &p1) const
-		{
-			return p1.first;
-		}
-	};
-
-	template< class Key, class Compare = std::less<Key>, class Allocator = std::allocator<Key> >
-	class set
 	// template <class _Key, class _Tp, class _Compare = std::less<_Key>, class _Allocator = std::allocator<ft::pair<const _Key, _Tp> > >
 	// class map
+	// template< class Key, class Compare = std::less<Key>, class Allocator = std::allocator<Key> >
+	template< class Key, class Compare = std::less<Key>, class Allocator = std::allocator<Key> >
+	class set
 	{
 	public:
     typedef Key                                     key_type;
@@ -54,7 +42,7 @@ namespace ft
 	: tree(key_compare(comp), allocator_type(alloc)) {}
 
 	template< class InputIt >
-	set( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() )
+	set( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : tree(key_compare())
 	{insert(first, last);}
 
 	set( const set& x ): tree(x.tree){}
@@ -178,48 +166,53 @@ namespace ft
 	}
 
 	// lookup end
-};
-}
 
-template< class Key, class T, class Compare, class Alloc >
+	key_compare key_comp() const
+	{
+		return (key_compare());
+	}
+};
+
+}
+template< class Key, class Compare, class Alloc >
 bool operator==( const ft::set<Key, Compare, Alloc>& lhs,
                  const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return (lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 bool operator!=( const ft::set<Key, Compare, Alloc>& lhs,
                  const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return (!(lhs == rhs));
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 bool operator<( const ft::set<Key, Compare, Alloc>& lhs, const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 bool operator>( const ft::set<Key, Compare, Alloc>& lhs, const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return rhs < lhs;
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 bool operator<=( const ft::set<Key, Compare, Alloc>& lhs, const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return (!(rhs < lhs));
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 bool operator>=( const ft::set<Key, Compare, Alloc>& lhs, const ft::set<Key, Compare, Alloc>& rhs )
 {
 	return (!(lhs < rhs));
 }
 
-template< class Key, class T, class Compare, class Alloc >
+template< class Key, class Compare, class Alloc >
 void swap( ft::set<Key, Compare, Alloc>& lhs,
            ft::set<Key, Compare, Alloc>& rhs )
 {
