@@ -144,6 +144,7 @@ namespace ft{
 
     };
 
+
     // template<class Cat, class T, class Dist= ptrdiff_t, class Ptr= T*, class Ref= T&>
 
     // template <typename T, class allocator>
@@ -320,8 +321,95 @@ namespace ft{
     }
 }
 
+    template<class _Iter1, class _Iter2>
+    typename ft::iterator_wrap<_Iter1>::difference_type operator-(const ft::iterator_wrap<_Iter1>& x, const ft::iterator_wrap<_Iter2>& y)
+    {
+        return x.base() - y.base();
+    }
+
+    template<class _Iter1, class _Iter2>
+    typename ft::reverse_iterator<_Iter1>::difference_type operator-(const ft::reverse_iterator<_Iter1>& x, const ft::reverse_iterator<_Iter2>& y)
+    {
+        return y.base() - x.base();
+    }
 
 
+
+
+
+template <class _Iter1, class _Iter2>
+bool operator==(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() == __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator<(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() > __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator!=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() != __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator>(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() < __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator>=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() <= __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator<=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
+{
+    return __x.base() >= __y.base();
+}
+
+
+
+template <class _Iter1, class _Iter2>
+bool operator==(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() == __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator<(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() > __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator!=(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() != __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator>(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() < __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator>=(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() <= __y.base();
+}
+
+template <class _Iter1, class _Iter2>
+bool operator<=(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
+{
+    return __x.base() >= __y.base();
+}
 
 
 #endif
