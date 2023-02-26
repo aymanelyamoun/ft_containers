@@ -36,13 +36,14 @@ namespace ft{
 		typedef typename RB_tree::iterator iterator;
 		typedef typename RB_tree::const_iterator const_iterator;
 		typedef typename RB_tree::reverse_iterator reverse_iterator;
+		typedef typename RB_tree::const_reverse_iterator const_reverse_iterator;
 
 	set() : tree(key_compare()) {}
 	explicit set( const key_compare& comp, const Allocator& alloc = Allocator())
 	: tree(key_compare(comp), allocator_type(alloc)) {}
 
 	template< class InputIt >
-	set( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : tree(key_compare())
+	set( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : tree(comp, alloc)
 	{insert(first, last);}
 
 	set( const set& x ): tree(x.tree){}
@@ -171,6 +172,11 @@ namespace ft{
 	{
 		return (key_compare());
 	}
+	value_compare value_comp() const
+	{
+		return (key_compare());
+	}
+
 };
 
 }

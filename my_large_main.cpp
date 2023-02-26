@@ -191,8 +191,72 @@ void map_test()
     mprint_irt<map<int, int>::reverse_iterator, map<int, int> >(m);
 
     std::cout << "Capacity: \n";
-    std::cout << m.empty
+    std::cout << "is empty: " << m.empty() << " size: " << m.size();
+    std::cout << "clearing map: \nbefore: ";
+    std::cout << "m: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    m.clear();
+    std::cout << "after\nm: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "inserting : \n";
+    for(int i = 10; i < 1000; i += 10)
+        m.insert(ft::make_pair(i, i + 10));
+    m.insert(vec.begin(), vec.begin() + 5);
+    m.insert(m.end()--, ft::make_pair(1900, 0));
+    std::cout << "m: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "erasing 30 : \n";
+    m.erase(30);
+    std::cout << "m: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "erasing begin : \n";
+    m.erase(m.begin());
+    {
+        map<int, int>::iterator tmp_it = m.begin();
+        std::cout << "erasing first 5 : \n";
+        for(int i = 0; i < 2; i++)
+            ++tmp_it;
+        for(int i = 0; i < 3; i++)
+            tmp_it++;
+        m.erase(m.begin(), tmp_it); 
+    }
+    std::cout << "m: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "swaping: \n";
+    std::cout << "before:\nm: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "m2: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m2);
+    m.swap(m2);
+    std::cout << "after:\nm: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "m2: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m2);
+    std::cout << "swaping again: \n";
+    ft::swap(m, m2);
+    std::cout << "after:\nm: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m);
+    std::cout << "m2: ";
+    mprint_it<map<int, int>::iterator, map<int, int> >(m2);
 
+    std::cout << "look ups:\n";
+    std::cout << "count 8000 : " << m.count(8000) << " count: 100: " << m.count(100) << std::endl;
+    std::cout <<  "find 30 :: (" << m.find(400)->second << "," << m.find(400)->first << ")" << std::endl;
+    {
+        ft::pair<map<int, int>::iterator, map<int, int>::iterator> iitt = m.equal_range(30);
+        std::cout << "f it :: (" << iitt.second->first << "," << iitt.second->second << ")" << "d it :: (" << iitt.second->first << "," << iitt.second->second << ")" << std::endl;
+    }
+    std::cout << "it : (" << m.lower_bound(40)->first << "," << m.lower_bound(40)->second << ")" << std::endl;
+    std::cout << "it : (" << m.upper_bound(40)->first << "," << m.upper_bound(40)->second << ")" << std::endl;
+    map<int, int>::key_compare comp_func = m.key_comp();
+    std::cout << comp_func(vec[3].first, vec[2].first) << " ";
+    std::cout << comp_func(vec[3].first, vec[4].first) << std::endl;
+    map<int, int>::value_compare comp_f = m.value_comp();
+    std::cout << comp_f(vec[3], vec[2]) << " ";
+    std::cout << comp_f(vec[3], vec[4]) << std::endl;
+
+    std::cout << "comparing: ";
+    std::cout << (m == m2) << " " << (m!=m2) << " " << (m > m2) << " " << (m < m2) << " " << (m <= m2) << " " << (m >= m2) << std::endl;
 }
 int main()
 {

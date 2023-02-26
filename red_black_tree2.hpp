@@ -16,281 +16,208 @@ namespace ft{
 template<typename T, class _get_key, class _Allocator , class compare >
 struct RBTree;
 
-//  template <typename T, class _get_key, class alloc, class comp>
-//     struct RB_Tree_iterator
-//     {
-//         typedef alloc allocator_type;
+template<typename node_ptr>
+node_ptr minimum(node_ptr node)
+{
+while (node->left != node->nil) {
+    node = node->left;
+}
+return node;
+}
 
-//         typedef T value_type;
-//         typedef std::bidirectional_iterator_tag iterator_category;
-//         typedef value_type&                                 reference;
-//         typedef const value_type&                           const_reference;
-//         typedef typename allocator_type::value_type*        pointer;
-//         typedef typename allocator_type::value_type const*  const_pointer;
-//         typedef typename allocator_type::size_type          size_type;
-//         typedef typename allocator_type::difference_type    difference_type;
-//         typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-//         // typedef node_p __node_ptr;
+template<typename node_ptr>
+node_ptr maximum(node_ptr node) {
+while (node->right != node->nil) {
+    node = node->right;
+}
+return node;
+}
 
-//         __node_ptr it;
-//         RB_Tree_iterator() {}
-//         RB_Tree_iterator(__node_ptr node): it(node) {}
-
-//         reference operator*() {return (it->data);}
-//         pointer operator->() {return (&(it->data));}
-
-//         RB_Tree_iterator &operator++() {it = it->successor(it); return *this;}
-//         RB_Tree_iterator operator++(int) {RB_Tree_iterator tmp(*this); ++(*this); return tmp;}
-
-//         RB_Tree_iterator &operator--() {it = it->predecessor(it); return *this;}
-//         RB_Tree_iterator operator--(int) {RB_Tree_iterator tmp(*this); --(*this); return tmp;}
-
-//         __node_ptr base() const {return it;}
-//         inline bool operator!=(const RB_Tree_iterator &lhs)
-//             { return (this->base() != lhs.base());}
-//         inline bool operator==(const RB_Tree_iterator &lhs)
-//             { return (this->base() == lhs.base()); }
-//     };
-
-
-
-
-    template<typename node_ptr>
-    node_ptr minimum(node_ptr node)
+template<typename node_ptr>
+node_ptr successor(node_ptr x)
+{
+    if (x->left == NULL && x->right == NULL)
+        return minimum(x->parent);
+    if (x->right != x->nil)
     {
-    while (node->left != node->nil) {
-        node = node->left;
-    }
-    return node;
+        return minimum(x->right);
     }
 
-    template<typename node_ptr>
-    node_ptr maximum(node_ptr node) {
-    while (node->right != node->nil) {
-        node = node->right;
-    }
-    return node;
-    }
-
-    template<typename node_ptr>
-    node_ptr successor(node_ptr x)
+    node_ptr y = x->parent;
+    while (y != x->nil && x == y->right)
     {
-        if (x->left == NULL && x->right == NULL)
-            return minimum(x->parent);
-        if (x->right != x->nil)
-        {
-            return minimum(x->right);
-        }
+        x = y;
+        y = y->parent;
+    }
+    return y;
+}
 
-        node_ptr y = x->parent;
-        while (y != x->nil && x == y->right)
-        {
-            x = y;
-            y = y->parent;
-        }
-        return y;
+template<typename node_ptr>
+node_ptr predecessor(node_ptr x)
+{
+    if (x->left == NULL && x->right == NULL)
+        return maximum(x->parent);
+    if (x->left != x->nil) {
+        return maximum(x->left);
+    }
+    node_ptr y = x->parent;
+    while (y != x->nil && x == y->left) {
+        x = y;
+        y = y->parent;
     }
 
-    template<typename node_ptr>
-    node_ptr predecessor(node_ptr x)
-    {
-        if (x->left == NULL && x->right == NULL)
-            return maximum(x->parent);
-        //     std::cout << x->parent << std::endl;
-        if (x->left != x->nil) {
-            return maximum(x->left);
-        }
+    return y;
+}
 
-        node_ptr y = x->parent;
-        while (y != x->nil && x == y->left) {
-            x = y;
-            y = y->parent;
-        }
+template<typename node_ptr>
+node_ptr get_next_node(node_ptr node)
+{
+    return successor(node);
+}
 
-        return y;
-    }
+template <typename T, class _get_key, class alloc, class Node_ptr>
+struct RB_Tree_iterator
+{
+    typedef alloc allocator_type;
 
-    template<typename node_ptr>
-    node_ptr get_next_node(node_ptr node)
-    {
-        return successor(node);
-    }
+    typedef T value_type;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef value_type&                                 reference;
+    typedef const value_type&                           const_reference;
+    typedef typename allocator_type::value_type*        pointer;
+    typedef typename allocator_type::value_type const*  const_pointer;
+    typedef typename allocator_type::size_type          size_type;
+    typedef typename allocator_type::difference_type    difference_type;
+    typedef Node_ptr __node_ptr;
 
+    __node_ptr it;
+    RB_Tree_iterator() {}
+    RB_Tree_iterator(__node_ptr node): it(node) {}
 
+    reference operator*() {return (it->data);}
+    pointer operator->() {return (&(it->data));}
 
+    RB_Tree_iterator &operator++() {it = successor(it); return *this;}
+    RB_Tree_iterator operator++(int) {RB_Tree_iterator tmp(*this); ++(*this); return tmp;}
 
+    RB_Tree_iterator &operator--() {it = predecessor(it); return *this;}
+    RB_Tree_iterator operator--(int) {RB_Tree_iterator tmp(*this); --(*this); return tmp;}
 
+    __node_ptr base() const {return it;}
+    inline bool operator!=(const RB_Tree_iterator &lhs)
+        { return (this->base() != lhs.base());}
+    inline bool operator==(const RB_Tree_iterator &lhs)
+        { return (this->base() == lhs.base()); }
+};
 
+template <typename T, class _get_key, class alloc, class Node_ptr>
+struct RB_Tree_const_iterator
+{
+    typedef alloc allocator_type;
+    typedef T value_type;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef const value_type&                                 reference;
+    typedef typename allocator_type::value_type const*        pointer;
+    typedef typename allocator_type::size_type          size_type;
+    typedef typename allocator_type::difference_type    difference_type;
+    typedef Node_ptr __node_ptr;
 
+    private:
+    typedef RB_Tree_iterator<T, _get_key, alloc, Node_ptr> non_const_iterator;
+    public:
+    __node_ptr it;
+    RB_Tree_const_iterator() {}
+    RB_Tree_const_iterator(non_const_iterator iter): it(iter.base()) {}
 
+    reference operator*() const {return (it->data);}
+    pointer operator->() const {return (&(it->data));}
 
+    RB_Tree_const_iterator &operator++() {it = successor(it); return *this;}
+    RB_Tree_const_iterator operator++(int) {RB_Tree_const_iterator tmp(*this); ++(*this); return tmp;}
 
+    RB_Tree_const_iterator &operator--() {it = predecessor(it); return *this;}
+    RB_Tree_const_iterator operator--(int) {RB_Tree_const_iterator tmp(*this); --(*this); return tmp;}
 
-    template <typename T, class _get_key, class alloc, class Node_ptr>
-    struct RB_Tree_iterator
-    {
-        typedef alloc allocator_type;
+    __node_ptr base() const {return it;}
+    inline bool operator!=(const RB_Tree_const_iterator &lhs)
+        { return (this->base() != lhs.base());}
+    inline bool operator==(const RB_Tree_const_iterator &lhs)
+        { return (this->base() == lhs.base()); }
+};
 
-        typedef T value_type;
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef value_type&                                 reference;
-        typedef const value_type&                           const_reference;
-        typedef typename allocator_type::value_type*        pointer;
-        typedef typename allocator_type::value_type const*  const_pointer;
-        typedef typename allocator_type::size_type          size_type;
-        typedef typename allocator_type::difference_type    difference_type;
-        // typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-        typedef Node_ptr __node_ptr;
-        // typedef node_p __node_ptr;
+template <typename T, class _get_key, class alloc, class Node_ptr>
+struct RB_Tree_reverse_iterator
+{
+    typedef alloc allocator_type;
+    typedef T value_type;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef value_type&                                 reference;
+    typedef const value_type&                           const_reference;
+    typedef typename allocator_type::value_type*        pointer;
+    typedef typename allocator_type::value_type const*  const_pointer;
+    typedef typename allocator_type::size_type          size_type;
+    typedef typename allocator_type::difference_type    difference_type;
+    typedef Node_ptr __node_ptr;
 
-        __node_ptr it;
-        RB_Tree_iterator() {}
-        RB_Tree_iterator(__node_ptr node): it(node) {}
+    __node_ptr it;
+    RB_Tree_reverse_iterator() {}
+    RB_Tree_reverse_iterator(__node_ptr node): it(node) {}
 
-        reference operator*() {return (it->data);}
-        pointer operator->() {return (&(it->data));}
+    reference operator*() {return (it->data);}
+    pointer operator->() {return (&(it->data));}
 
-        RB_Tree_iterator &operator++() {it = successor(it); return *this;}
-        RB_Tree_iterator operator++(int) {RB_Tree_iterator tmp(*this); ++(*this); return tmp;}
+    RB_Tree_reverse_iterator &operator++() {it = predecessor(it); return *this;}
+    RB_Tree_reverse_iterator operator++(int) {RB_Tree_reverse_iterator tmp(*this); ++(*this); return tmp;}
 
-        RB_Tree_iterator &operator--() {it = predecessor(it); return *this;}
-        RB_Tree_iterator operator--(int) {RB_Tree_iterator tmp(*this); --(*this); return tmp;}
+    RB_Tree_reverse_iterator &operator--() {it = successor(it); return *this;}
+    RB_Tree_reverse_iterator operator--(int) {RB_Tree_reverse_iterator tmp(*this); --(*this); return tmp;}
 
-        __node_ptr base() const {return it;}
-        inline bool operator!=(const RB_Tree_iterator &lhs)
-            { return (this->base() != lhs.base());}
-        inline bool operator==(const RB_Tree_iterator &lhs)
-            { return (this->base() == lhs.base()); }
-    };
+    __node_ptr base() const {return it;}
+    inline bool operator!=(const RB_Tree_reverse_iterator &lhs)
+        { return (this->base() != lhs.base());}
+    inline bool operator==(const RB_Tree_reverse_iterator &lhs)
+        { return (this->base() == lhs.base()); }
+};
 
-    template <typename T, class _get_key, class alloc, class Node_ptr>
-    struct RB_Tree_const_iterator
-    {
-        typedef alloc allocator_type;
-        typedef T value_type;
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef const value_type&                                 reference;
-        // typedef const value_type&                           const_reference;
-        typedef typename allocator_type::value_type const*        pointer;
-        // typedef typename allocator_type::value_type const*  const_pointer;
-        typedef typename allocator_type::size_type          size_type;
-        typedef typename allocator_type::difference_type    difference_type;
-        // typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-        typedef Node_ptr __node_ptr;
+template <typename T, class _get_key, class alloc, class Node_ptr>
+struct RB_Tree_const_reverse_iterator
+{
+    typedef alloc allocator_type;
+    typedef T value_type;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef const value_type&                                 reference;
+    // typedef const value_type&                           const_reference;
+    typedef typename allocator_type::value_type const*        pointer;
+    // typedef typename allocator_type::value_type const*  const_pointer;
+    typedef typename allocator_type::size_type          size_type;
+    typedef typename allocator_type::difference_type    difference_type;
+    // typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
+    typedef Node_ptr __node_ptr;
+    // typedef node_p __node_ptr;
+    private:
+    typedef RB_Tree_reverse_iterator<T, _get_key, alloc, Node_ptr> non_const_reverse_iteratotr;
+    public:
+    __node_ptr it;
+    RB_Tree_const_reverse_iterator() {}
+    RB_Tree_const_reverse_iterator(__node_ptr node): it(node) {}
+    RB_Tree_const_reverse_iterator(non_const_reverse_iteratotr iter): it(iter.base()) {}
 
-        private:
-        typedef RB_Tree_iterator<T, _get_key, alloc, Node_ptr> non_const_iterator;
-        public:
-        __node_ptr it;
-        RB_Tree_const_iterator() {}
-        RB_Tree_const_iterator(non_const_iterator iter): it(iter.base()) {}
+    reference operator*() const {return (it->data);}
+    pointer operator->() const {return (&(it->data));}
 
-        reference operator*() const {return (it->data);}
-        pointer operator->() const {return (&(it->data));}
+    RB_Tree_const_reverse_iterator &operator++() {it = predecessor(it); return *this;}
+    RB_Tree_const_reverse_iterator operator++(int) {RB_Tree_const_reverse_iterator tmp(*this); ++(*this); return tmp;}
 
-        RB_Tree_const_iterator &operator++() {it = successor(it); return *this;}
-        RB_Tree_const_iterator operator++(int) {RB_Tree_const_iterator tmp(*this); ++(*this); return tmp;}
+    RB_Tree_const_reverse_iterator &operator--() {it = successor(it); return *this;}
+    RB_Tree_const_reverse_iterator operator--(int) {RB_Tree_const_reverse_iterator tmp(*this); --(*this); return tmp;}
 
-        RB_Tree_const_iterator &operator--() {it = predecessor(it); return *this;}
-        RB_Tree_const_iterator operator--(int) {RB_Tree_const_iterator tmp(*this); --(*this); return tmp;}
-
-        __node_ptr base() const {return it;}
-        inline bool operator!=(const RB_Tree_const_iterator &lhs)
-            { return (this->base() != lhs.base());}
-        inline bool operator==(const RB_Tree_const_iterator &lhs)
-            { return (this->base() == lhs.base()); }
-    };
-
-    template <typename T, class _get_key, class alloc, class Node_ptr>
-    struct RB_Tree_reverse_iterator
-    {
-        typedef alloc allocator_type;
-        typedef T value_type;
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef value_type&                                 reference;
-        typedef const value_type&                           const_reference;
-        typedef typename allocator_type::value_type*        pointer;
-        typedef typename allocator_type::value_type const*  const_pointer;
-        typedef typename allocator_type::size_type          size_type;
-        typedef typename allocator_type::difference_type    difference_type;
-        typedef Node_ptr __node_ptr;
-        // typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-        // typedef node_p __node_ptr;
-
-        __node_ptr it;
-        RB_Tree_reverse_iterator() {}
-        RB_Tree_reverse_iterator(__node_ptr node): it(node) {}
-
-        reference operator*() {return (it->data);}
-        pointer operator->() {return (&(it->data));}
-
-        RB_Tree_reverse_iterator &operator++() {it = predecessor(it); return *this;}
-        RB_Tree_reverse_iterator operator++(int) {RB_Tree_reverse_iterator tmp(*this); ++(*this); return tmp;}
-
-        RB_Tree_reverse_iterator &operator--() {it = successor(it); return *this;}
-        RB_Tree_reverse_iterator operator--(int) {RB_Tree_reverse_iterator tmp(*this); --(*this); return tmp;}
-
-        __node_ptr base() const {return it;}
-        inline bool operator!=(const RB_Tree_reverse_iterator &lhs)
-            { return (this->base() != lhs.base());}
-        inline bool operator==(const RB_Tree_reverse_iterator &lhs)
-            { return (this->base() == lhs.base()); }
-    };
-
-    template <typename T, class _get_key, class alloc, class Node_ptr>
-    struct RB_Tree_const_reverse_iterator
-    {
-        typedef alloc allocator_type;
-        typedef T value_type;
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef const value_type&                                 reference;
-        // typedef const value_type&                           const_reference;
-        typedef typename allocator_type::value_type const*        pointer;
-        // typedef typename allocator_type::value_type const*  const_pointer;
-        typedef typename allocator_type::size_type          size_type;
-        typedef typename allocator_type::difference_type    difference_type;
-        // typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-        typedef Node_ptr __node_ptr;
-        // typedef node_p __node_ptr;
-        private:
-        typedef RB_Tree_reverse_iterator<T, _get_key, alloc, Node_ptr> non_const_reverse_iteratotr;
-        public:
-        __node_ptr it;
-        RB_Tree_const_reverse_iterator() {}
-        RB_Tree_const_reverse_iterator(__node_ptr node): it(node) {}
-        RB_Tree_const_reverse_iterator(non_const_reverse_iteratotr iter): it(iter.base()) {}
-
-        reference operator*() const {return (it->data);}
-        pointer operator->() const {return (&(it->data));}
-
-        RB_Tree_const_reverse_iterator &operator++() {it = predecessor(it); return *this;}
-        RB_Tree_const_reverse_iterator operator++(int) {RB_Tree_const_reverse_iterator tmp(*this); ++(*this); return tmp;}
-
-        RB_Tree_const_reverse_iterator &operator--() {it = successor(it); return *this;}
-        RB_Tree_const_reverse_iterator operator--(int) {RB_Tree_const_reverse_iterator tmp(*this); --(*this); return tmp;}
-
-        __node_ptr base() const {return it;}
-        inline bool operator!=(const RB_Tree_const_reverse_iterator &lhs)
-            { return (this->base() != lhs.base());}
-        inline bool operator==(const RB_Tree_const_reverse_iterator &lhs)
-            { return (this->base() == lhs.base()); }
-    };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    __node_ptr base() const {return it;}
+    inline bool operator!=(const RB_Tree_const_reverse_iterator &lhs)
+        { return (this->base() != lhs.base());}
+    inline bool operator==(const RB_Tree_const_reverse_iterator &lhs)
+        { return (this->base() == lhs.base()); }
+};
+    
 template <typename key>
 struct get_key
 {
@@ -302,33 +229,26 @@ struct get_key
     }
 };
 
+template< typename T>
+struct _Node
+{
+    T data;
+    _Node *right;
+    _Node *left;
+    _Node *parent;
+    bool color;
+    _Node *nil;
 
-    template< typename T>
-    struct _Node
-    {
-        T data;
-        _Node *right;
-        _Node *left;
-        _Node *parent;
-        bool color;
-		_Node *nil;
+    _Node(T data, _Node *nil): data(data), right(nil), left(nil), parent(nil), color(RED), nil(nil){}
 
-        _Node(T data, _Node *nil): data(data), right(nil), left(nil), parent(nil), color(RED), nil(nil){}
-
-        _Node(bool color): color(color), right(NULL), left(NULL), parent(NULL) {}
-        _Node (const _Node & obj, T data):color(obj.color), right(obj.right), left(obj.left), parent(obj.parent), data(data), nil(obj.nil){}
-        void recolor() { color = !color;}
-        void be_black() {color = BLACK;}
-        void be_red() {color = RED;}
-        bool is_red(){return (color == RED);}
-        bool is_black(){return (color == BLACK);}
-    };
-
-
-
-
-
-
+    _Node(bool color): right(NULL), left(NULL), parent(NULL), color(color) {}
+    _Node (const _Node & obj, T data):data(data),  right(obj.right), left(obj.left), parent(obj.parent), color(obj.color), nil(obj.nil){}
+    void recolor() { color = !color;}
+    void be_black() {color = BLACK;}
+    void be_red() {color = RED;}
+    bool is_red(){return (color == RED);}
+    bool is_black(){return (color == BLACK);}
+};
 
 template<typename T, class _get_key = get_key<T> , class _Allocator = std::allocator<T> , class compare = std::less<T> >
 struct RBTree
@@ -339,13 +259,9 @@ struct RBTree
     typedef typename _get_key::key_type key_type;
 	typedef typename _Allocator::size_type size_type;
 
-
-//aymane
-    // typedef Node* node_ptr;
     typedef T value_type;
     typedef value_type& reference;
     typedef _Allocator allocator_type;
-	// typedef typename allocator_type::difference_type    difference_type;
     typedef _Node<value_type> Node;
     typedef typename allocator_type::template rebind<Node>::other	allocator_node;
     typedef typename allocator_node::value_type* node_ptr;
@@ -358,12 +274,10 @@ struct RBTree
 
     private:
         difference_type _size;
+        allocator_node alloc;
     public:
-    // iterator __begin;
-    allocator_node alloc;
-    Node	*nil;// = new Node(BLACK);
-    // RBTree **root_ptr = &this;
-    Node	*root;
+        Node	*nil;
+        Node	*root;
 
 
     int has_red_child(node_ptr node)
@@ -376,9 +290,6 @@ struct RBTree
             return (LEFT);
         return (0);
     }
-
-
-
 
     iterator begin() {return (find_min(root));}
     iterator end() {return (nil);}
@@ -393,25 +304,25 @@ struct RBTree
     {
         nil = alloc.allocate(1);
         alloc.construct(nil, Node(BLACK));
-        // nil = new Node(BLACK);
         root = nil;
         _size = 0;
+        comp = cmp;
     }
 
     explicit RBTree(const value_compare& __comp, const allocator_type& __a)
     {
         nil = alloc.allocate(1);
         alloc.construct(nil, Node(BLACK));
-        // nil = new Node(BLACK) ;
         root = nil;
         _size = 0;
+        comp = __comp;
+        alloc = __a;
     }
 
     RBTree(const RBTree& tree)
     {
         nil = alloc.allocate(1);
         alloc.construct(nil, Node(BLACK));
-        // nil = new Node(BLACK) ;
         root = nil;
         _size = 0;
         insert(tree.begin(), tree.end());
@@ -424,7 +335,6 @@ struct RBTree
         alloc.deallocate(nil, 1);
     }
 
-    // typedef typename allocator_type::difference_type difference_type;
     size_type size() const
     {
         return _size;
@@ -432,7 +342,6 @@ struct RBTree
 
     size_type max_size() const throw()
     {
-        // std::cout << "max : " << alloc.max_size() << std::endl;
         return std::min<unsigned long>(alloc.max_size(), std::numeric_limits<difference_type >::max());
     }
 
@@ -440,16 +349,6 @@ struct RBTree
     {
         std::cout << "begin: " << begin().base() << " root: " << this->root << " nil: " << this->nil << " end: " << end().base() << std::endl;
     }
-
-    // RBTree& operator=(const RBTree& tree)
-    // {
-    //     // if (*this != tree)
-    //         // insert(tree.begin(), tree.end());
-    //     root = tree.root;
-    //     nil = tree.nil;
-
-    //     return (*this);
-    // }
 
     allocator_type get_allocator() const
     {
@@ -463,7 +362,7 @@ struct RBTree
         tmp = this->root;
         while (tmp != this->nil)
         {
-            if (comp(key(tmp->data), value))// tmp->data < data)
+            if (comp(key(tmp->data), value))
                 tmp = tmp->right;
             else if (comp(value, key(tmp->data)))
                 tmp = tmp->left;
@@ -482,7 +381,7 @@ struct RBTree
         tmp = this->root;
         while (tmp != this->nil)
         {
-            if (comp(key(tmp->data), value))// tmp->data < data)
+            if (comp(key(tmp->data), value))
                 tmp = tmp->right;
             else if (comp(value, key(tmp->data)))
                 tmp = tmp->left;
@@ -491,9 +390,8 @@ struct RBTree
                 break;
             }
         }
-        return iterator (tmp);
+        return const_iterator (tmp);
     }
-    // const_iterator find( const Key& key ) const;
 
 
     node_ptr find(node_ptr *parent, key_type value) const
@@ -506,7 +404,7 @@ struct RBTree
             *parent = tmp;
             if (comp(value, key(tmp->data)))
                 tmp = tmp->left;
-            else if (comp(key(tmp->data), value))// tmp->data < data)
+            else if (comp(key(tmp->data), value))
                 tmp = tmp->right;
             else
             {
@@ -518,17 +416,13 @@ struct RBTree
 
     node_ptr find(const_iterator pos, node_ptr *parent, key_type value) const
     {
-        // std::cout << "entered to the find with pos: \n";
         if (pos == end() || comp(value, key(*pos)))
         {
-            // std::cout << "struck in 1\n";
             const_iterator prior = pos;
             if ((pos == begin() || comp(key(*(--prior)), value)) && prior != end())
             {
-                // std::cout << "prior: " << prior->first << std::endl;
                 if (pos.base()->left == this->nil)
                 {
-                    // std::cout << "value: " << value << std::endl;
                     *parent = pos.base();
                     return (this->nil);
                 }
@@ -538,7 +432,6 @@ struct RBTree
                     return (prior.base()->right);
                 }
             }
-            // std::cout << "got to normal find\n";
             return (find(parent, value));
         }
         else if (comp(key(*pos), value))
@@ -557,10 +450,8 @@ struct RBTree
                     return next.base()->left;
                 }
             }
-            // std::cout << "got to normal find\n";
             return (find(parent, value));
         }
-        // std::cout << "got out from the find with pos: \n";
         *parent = pos.base();
         return pos.base();
     }
@@ -614,16 +505,10 @@ struct RBTree
     {
         iterator it;
         it = this->begin();
-        // iterator tmp;
         for (;it != this->end(); )
         {
-            // tmp = it;
-            // std::cout << it->first << " " << it.base()->left << " " << it.base()->right<< std::endl;
 			it = erase(it);
-            // delete_(it);
         }
-        // while (this->root != nil)
-        //     erase(root->data.first);
     }
 
     int child_derection(Node *root)
@@ -713,7 +598,6 @@ struct RBTree
 
     void transplant(Node *node, Node *add)
     {
-        // if (node == root)
         if (node->parent == this->nil)
             this->root = add;
         if (node->parent->left == node)
@@ -734,40 +618,6 @@ struct RBTree
         }
     }
 
-    // void rb_left_rotate(Node *x)
-    // {
-    //     node_ptr y = x->right;
-    //     x->right = y->left;
-    //     if (y->left != nil)
-    //         y->left->parent = x;
-    //     y->parent = x->parent;
-    //     if (x->parent == nil)
-    //         this->root = y;
-    //     else if (x == x->parent->left)
-    //         x->parent->left = y;
-    //     else
-    //         x->parent->right = y;
-    //     y->left = x;
-    //     x->parent = y;
-    // }
-
-    // void rb_right_rotate(Node *x)
-    // {
-    //     node_ptr y = x->left;
-    //     x->left = y->right;
-    //     if (y->right != nil)
-    //         y->right->parent = x;
-    //     y->parent = x->parent;
-    //     if (x->parent == nil)
-    //         this->root = y;
-    //     else if (x == x->parent->right)
-    //         x->parent->right = y;
-    //     else
-    //         x->parent->left = y;
-    //     y->right = x;
-    //     x->parent = y;
-    // }
-
     void rb_left_rotate(Node *root)
     {
         Node *tmp = root->right;
@@ -777,15 +627,9 @@ struct RBTree
         root->right = tmp2;
         if(tmp2 != nil)
             tmp2->parent = root;
-        // if (root == this->root)
-        //     this->root = tmp;
         transplant(root, tmp);
-        // tmp->parent = root->parent;
-        // link_to_tree(root, tmp);
         root->parent = tmp;
-        // std::cout << "got out l\n";
     }
-
 
     void rb_right_rotate(Node *root)
     {
@@ -797,18 +641,11 @@ struct RBTree
         if(tmp2 != nil)
             tmp2->parent = root;
         transplant(root, tmp);
-        // if (root == this->root)
-        //     this->root = tmp;
-        // tmp->parent = root->parent;
-        // link_to_tree(root, tmp);
         root->parent = tmp;
-        // std::cout << "got out r\n";
     }
 
     void fix_db(Node *parent, Node *db, Node *sibling)
     {
-        Node *tmp;
-
         if (db == this->root)
             return ;
         if (sibling == this->nil)
@@ -899,21 +736,15 @@ struct RBTree
             _size--;
         if (tmp->left == this->nil && tmp->right == this->nil)
         {
-            // std::cout << "data: " << tmp->data.first << " +++++++1\n";
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = this->nil;
             transplant(tmp, this->nil);
             if (tmp->is_black())
                 fix_db(parent, db, sibling);
-            // alloc.destroy(tmp);
-            // alloc.deallocate(tmp, 1);
-            // delete tmp;
-            // tmp = this->nil;
         }
         else if (tmp->left != this->nil && tmp->right == this->nil)
         {
-            // std::cout << "+++++++2\n";
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = tmp->left;
@@ -921,12 +752,9 @@ struct RBTree
             if (tmp->left->is_black() && tmp->is_black())
                 fix_db(parent, db, sibling);
             else tmp->left->be_black();
-            // delete tmp;
-            // tmp = this->nil;
         }
         else if (tmp->left == this->nil && tmp->right != this->nil)
         {
-            // std::cout << "+++++++3\n";
             sibling = get_sibling(tmp);
             parent = tmp->parent;
             db = tmp->right;
@@ -934,12 +762,9 @@ struct RBTree
             if (tmp->right->is_black() && tmp->is_black())
                 fix_db(parent, db, sibling);
             else tmp->right->be_black();
-            // delete tmp;
-            // tmp = this->nil;
         }
         else
         {
-            // std::cout << "+++++++4\n";
             tmp2 = find_min(tmp->right);
             sibling = get_sibling(tmp2);
             node_ptr replace = alloc.allocate(1);
@@ -949,7 +774,6 @@ struct RBTree
             tmp2->left = tmp->left;
             tmp2->right = tmp->right;
             tmp2->color = tmp->color;
-            // tmp2->parent = tmp->parent;
             parent = replace->parent;
             db = replace->right;
             
@@ -957,14 +781,9 @@ struct RBTree
             if (replace->is_black() && db->is_black())
                 fix_db(parent, db, sibling);
             else replace->right->be_black();
-            // next = successor();
 
-            // std::cout <<"tm p: " << tmp2 << std::endl;
             alloc.destroy(replace);
             alloc.deallocate(replace, 1);
-            // delete tmp2;
-            // delete tmp;
-            // tmp2 = this->nil;
         }
         alloc.destroy(tmp);
         alloc.deallocate(tmp, 1);
@@ -1061,13 +880,12 @@ struct RBTree
         {
             node_ptr tmp = alloc.allocate(1);
             alloc.construct(tmp, Node(data, this->nil));
-            // node_ptr tmp = new Node(data, this->nil);
             ret.first = iterator(tmp);
             ret.second = true;
             _size++;
             return (tmp);
         }
-        if (comp(key(root->data), key(data)))// data > root->data)//
+        if (comp(key(root->data), key(data)))
         {
             root->right = insert_util(root->right, data, &rotate, ret);
             root->right->parent = root;
@@ -1110,7 +928,6 @@ struct RBTree
 				if (child_derection(node->parent) == LEFT)
 				{
 					tmp = node->parent->parent;
-					// std::cout << "++:::-:::++\n";
 					if(child_derection(node) == RIGHT)
 						rb_left_rotate(node->parent);
                     if (tmp == nil)
@@ -1127,7 +944,6 @@ struct RBTree
 				else
 				{
 					tmp = node->parent->parent;
-					// std::cout << "++::::::++\n";
 					if(child_derection(node) == LEFT)
 						rb_right_rotate(node->parent);
                     if (tmp != nil)
@@ -1135,9 +951,6 @@ struct RBTree
                     if (tmp->right != nil)
                         tmp->right->recolor();
 					rb_left_rotate(tmp);
-					// node->parent->recolor();
-					// node->parent->left->recolor();
-					// std::cout << "++:::done:::++\n";
 				}
 			}
 		}
@@ -1145,7 +958,7 @@ struct RBTree
 
 	ft::pair<iterator, bool> insert_while(iterator pos, value_type data)
 	{
-		node_ptr tmp;
+		// node_ptr tmp;
 		node_ptr parent;
 		bool found = true;
 		node_ptr node;
@@ -1155,7 +968,6 @@ struct RBTree
             node = find(pos, &parent, key(data));
         else
             node = find(&parent, key(data));
-        // node = find(pos, &parent, key(data)).base();
         
         if (node == this->nil || root == this->nil)
             found = false;
@@ -1194,7 +1006,6 @@ struct RBTree
 
     ft::pair<iterator, bool> insert(T data)
     {
-
         return insert_while(this->nil, data);
     }
 
@@ -1205,32 +1016,7 @@ struct RBTree
         std::swap(alloc, tree.alloc);
         std::swap(comp, tree.comp);
         std::swap(_size, tree._size);
-
-		// std::swap<node_ptr>(root, tree.root);
-        // std::swap<allocator_type>(alloc, tree.alloc);
-        // std::swap<value_compare>(comp, tree.comp);
     }
-
-    // std::pair<iterator, bool> insert(key_type key)
-    // {
-    //     std::pair<iterator, bool> ret;
-    //     value_type data(key, 0);
-
-    //     // data.first = key;
-    //     // data.second = my_allocator.construct();
-    //     ret.first = this->nil;
-    //     ret.second = false;
-    //     if (this->root == this->nil)
-    //     {
-    //         this->root = insert_util(root, data, 0, ret);
-    //         this->root->recolor();
-    //     }
-    //     else
-    //     {
-    //         this->root = insert_util(this->root, data, 0, ret);
-    //     }
-    //     return ret;
-    // }
 
     Node* find_max(Node* root) const
     {
@@ -1247,13 +1033,11 @@ struct RBTree
         return (find_min(root->left));
     }
 
-    /* add the delete logic here */
 	iterator erase( iterator pos )
 	{
 	    Node *tmp;
 
         tmp = pos.base();
-        // std::cout << "t d: " << tmp->data.first << " t l: " << tmp->left << " t r " << tmp->right << std::endl;
 		++pos;
         delete_node(tmp);
         nil->parent = root;
@@ -1262,19 +1046,10 @@ struct RBTree
 
 	iterator erase( iterator first, iterator last )
 	{
-		// iterator ret = first++;
-        // printTree();
 		for(; first != last;)
         {
-            // std::cout << "r: " << root->data.first << std::endl;
-            // std::cout << "++++++++++==================+++++++++++++\n";
-            // printTree();
 			first = erase(first);
-            // std::cout <<"fr p: " << first.base() << std::endl;
-            // std::cout << "r: " << root->data.first << std::endl;
-            // std::cout << first->first << std::endl;
         }
-        // nil->parent = root;
 		return first;
 	}
 
@@ -1301,12 +1076,6 @@ struct RBTree
 		return found;
     }
 
-	// template <class InputIterator>
-    // void delete_(InputIterator it)
-    // {
-    //     delete_(*it);
-    // }
-
 	template <class InputIterator>
     void insert (InputIterator first, InputIterator last)
     {
@@ -1326,7 +1095,6 @@ struct RBTree
             inorderTraversalHelper(node->right);
         }
     }
-    //function to print inorder traversal
     void inorderTraversal()
     {
         inorderTraversalHelper(this->root);
@@ -1351,7 +1119,6 @@ struct RBTree
             else
                 std::cout << 'b';
             // else
-                // std::cout << "nil";
             std::cout << std::endl; 
             printTreeHelper(root->left, space); 
         }
@@ -1362,61 +1129,6 @@ struct RBTree
     }
 
 };
-// }
-// template <typename T, class _Allocator = std::allocator<T> >
-// struct test
-// {
-// typedef T value_type;
-//     typedef _Allocator allocator_type;
-
-//     typedef typename ft::RB_Tree_iterator<value_type, allocator_type> iterator;
-// };
-
-// #include <string>
-// // #include <set>
-//     int main() 
-//     {
-//         RBTree<int> t;
-//         RBTree<int>::iterator it;
-//         // std::set<int> hop;
-//         int input;
-//         long long i = 0;
-//         // int arr[] = {1,4,6,3,5,7,8,2,9};
-//         while(1)
-//         {
-//             std::cin >> input;
-//             // hop.insert(i);
-//             if (input == 1)
-//             {
-//                 std::cin >> input;
-//                 t.insert(input);
-//             }
-//             else if (input == 2)
-//             {
-//                 std::cin >> input;
-//                 t.delete_(input);
-//             }
-//             else if (input == 3)
-//                 break;
-//             // if (t.root == t.nil)
-//             //     break;
-//             // std::cout << std::endl;
-//             // t.inorderTraversal();
-//             i++;
-//             t.printTree();
-//             // std::cout << arr[i] <<"++000++\n";
-//         }
-//         for (int i = 0; i < 3; i++)
-//         {
-//             std::cout << *it;
-//         }
-//         // you can check colour of any node by with its attribute node.colour
-//     }
-
-// int main()
-// {
-//     RBTree tree;
-
 
 }
 
