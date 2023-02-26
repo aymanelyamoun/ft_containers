@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include <memory>
+#include "type_trait.hpp"
 #ifndef ME
 #define ME
 // #include "red_black_tree2.hpp"
@@ -66,6 +67,13 @@ namespace ft{
         public:
             iterator_wrap() {};
             iterator_wrap(iterator_type ptr) : it(ptr) {};
+            template <class tp >
+            iterator_wrap(const iterator_wrap<tp> &out_it, typename ft::enable_if<std::is_convertible<tp, iterator_type>::value>::type* = 0): it(out_it.base()) {}
+            // template <class tp>
+// iterator_wrap(typename ft::enable_if<std::is_convertible<tp, iterator_type>::value, const iterator_wrap<tp>&>::type out_it) : it(out_it.base()) {}
+
+            // iterator_wrap(typename ft::enable_if<std::is_convertible<tp, iterator_type>::value, const iterator_wrap<tp> >::type out_it) : it(out_it.base()){}
+
         
             reference       operator*() { return (*it); }
             pointer         operator->() {return (it); }
@@ -76,8 +84,8 @@ namespace ft{
             iterator_wrap   &operator--(){ it-- ; return *this;}
             iterator_wrap   operator--(int){ iterator_wrap tmp(*this); --(*this); return tmp; }
 
-            iterator_wrap   operator+(difference_type n) { iterator_wrap tmp(*this) ; tmp += n; return (tmp); }
-            iterator_wrap   operator-(difference_type n) { iterator_wrap tmp(*this) ; tmp -= n; return (tmp); }
+            iterator_wrap   operator+(difference_type n) const { iterator_wrap tmp(*this) ; tmp += n; return (tmp); }
+            iterator_wrap   operator-(difference_type n) const { iterator_wrap tmp(*this) ; tmp -= n; return (tmp); }
 
             iterator_wrap   &operator-=(difference_type n) { it -= n; return (*this); }
             iterator_wrap   &operator+=(difference_type n) { it += n; return (*this); }
@@ -85,17 +93,35 @@ namespace ft{
             reference       operator[](difference_type n) {return (it[n]);}
             iterator_type   base() const {return it;}
             
-            template<class iter>
-            inline bool operator==(const iterator_wrap<iter> &lhs) 
-            { return (this->base() == lhs.base()); }
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator==(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator!=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator<(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator>(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator>=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+            // template <class _Iter1, class _Iter2>
+            // friend bool operator<=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y);
+
+            // template<class iter>
+            // inline bool operator==(const iterator_wrap<iter> &lhs) 
+            // { return (this->base() == lhs.base()); }
  
-            template<class iter>
-            inline bool operator!=(const iterator_wrap<iter> &lhs) 
-            { return (this->base() != lhs.base());}
+            // template<class iter>
+            // inline bool operator!=(const iterator_wrap<iter> &lhs) 
+            // { return (this->base() != lhs.base());}
+
 
             // bool            operator<(iterator_wrap &lhs) {}
     };
-    
+    template<class _Iter1, class _Iter2>
+    typename ft::iterator_wrap<_Iter1>::difference_type operator-(const ft::iterator_wrap<_Iter1>& x, const ft::iterator_wrap<_Iter2>& y)
+    {
+        return x.base() - y.base();
+    }
     template <class _Iter>
     class reverse_iterator
     : public iterator<typename iterator_traits<_Iter>::iterator_category,
@@ -111,7 +137,7 @@ namespace ft{
             typedef typename iterator_traits<_Iter>::pointer         pointer;
         private:
             iterator_type current;
-        
+        public:
         reverse_iterator() {}
         reverse_iterator (iterator_type __iter) : current(__iter){};
         template<class __iner>
@@ -127,8 +153,8 @@ namespace ft{
         
         pointer operator->() const {iterator_type tmp = current; return (--tmp);}
         
-        reverse_iterator &operator++() {current-- ;return (*this);}
-        reverse_iterator operator++(int) {reverse_iterator tmp = *this; --(*this); return (tmp);}
+        reverse_iterator &operator++() {current-- ; return (*this);}
+        reverse_iterator operator++(int) {reverse_iterator tmp = *this; ++(*this); return (tmp);}
 
         reverse_iterator &operator--() {current++; return (*this);}
         reverse_iterator operator--(int) {reverse_iterator tmp = *this; ++(*this); return (tmp);}
@@ -144,168 +170,12 @@ namespace ft{
 
     };
 
-
-    // template<class Cat, class T, class Dist= ptrdiff_t, class Ptr= T*, class Ref= T&>
-
-    // template <typename T, class allocator>
-    // struct Node_iter
-    // {
-    //     typedef allocator allocator_type;
-    //     typedef std::bidirectional_iterator_tag iterator_category;
-    //     typedef typename allocator_type::value_type*        pointer;
-    //     typedef typename allocator_type::value_type const*  const_pointer;
-    //     typedef typename allocator_type::size_type          size_type;
-    //     typedef typename allocator_type::difference_type    difference_type;
-
-    // };
-
-//*****************************
-
-    // template <typename T, class _get_key, class alloc, class comp>
-    // struct RB_Tree_iterator
-    // {
-    //     typedef alloc allocator_type;
-
-    //     typedef T value_type;
-    //     typedef std::bidirectional_iterator_tag iterator_category;
-    //     typedef value_type&                                 reference;
-    //     typedef const value_type&                           const_reference;
-    //     typedef typename allocator_type::value_type*        pointer;
-    //     typedef typename allocator_type::value_type const*  const_pointer;
-    //     typedef typename allocator_type::size_type          size_type;
-    //     typedef typename allocator_type::difference_type    difference_type;
-    //     typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-    //     // typedef node_p __node_ptr;
-
-    //     __node_ptr it;
-    //     RB_Tree_iterator() {}
-    //     RB_Tree_iterator(__node_ptr node): it(node) {}
-
-    //     reference operator*() {return (it->data);}
-    //     pointer operator->() {return (&(it->data));}
-
-    //     RB_Tree_iterator &operator++() {it = it->successor(it); return *this;}
-    //     RB_Tree_iterator operator++(int) {RB_Tree_iterator tmp(*this); ++(*this); return tmp;}
-
-    //     RB_Tree_iterator &operator--() {it = it->predecessor(it); return *this;}
-    //     RB_Tree_iterator operator--(int) {RB_Tree_iterator tmp(*this); --(*this); return tmp;}
-
-    //     __node_ptr base() const {return it;}
-    //     inline bool operator!=(const RB_Tree_iterator &lhs)
-    //         { return (this->base() != lhs.base());}
-    //     inline bool operator==(const RB_Tree_iterator &lhs)
-    //         { return (this->base() == lhs.base()); }
-    // };
-
-    // template <typename T, class _get_key, class alloc, class comp>
-    // struct RB_Tree_const_iterator
-    // {
-    //     typedef alloc allocator_type;
-    //     typedef T value_type;
-    //     typedef std::bidirectional_iterator_tag iterator_category;
-    //     typedef const value_type&                                 reference;
-    //     // typedef const value_type&                           const_reference;
-    //     typedef typename allocator_type::value_type const*        pointer;
-    //     // typedef typename allocator_type::value_type const*  const_pointer;
-    //     typedef typename allocator_type::size_type          size_type;
-    //     typedef typename allocator_type::difference_type    difference_type;
-    //     typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-
-    //     private:
-    //     typedef RB_Tree_iterator<T, _get_key, alloc, comp> non_const_iterator;
-    //     public:
-    //     __node_ptr it;
-    //     RB_Tree_const_iterator() {}
-    //     RB_Tree_const_iterator(non_const_iterator iter): it(iter.base()) {}
-
-    //     reference operator*() const {return (it->data);}
-    //     pointer operator->() const {return (&(it->data));}
-
-    //     RB_Tree_const_iterator &operator++() {it = it->successor(it); return *this;}
-    //     RB_Tree_const_iterator operator++(int) {RB_Tree_const_iterator tmp(*this); ++(*this); return tmp;}
-
-    //     RB_Tree_const_iterator &operator--() {it = it->predecessor(it); return *this;}
-    //     RB_Tree_const_iterator operator--(int) {RB_Tree_const_iterator tmp(*this); --(*this); return tmp;}
-
-    //     __node_ptr base() const {return it;}
-    //     inline bool operator!=(const RB_Tree_const_iterator &lhs)
-    //         { return (this->base() != lhs.base());}
-    //     inline bool operator==(const RB_Tree_const_iterator &lhs)
-    //         { return (this->base() == lhs.base()); }
-    // };
-
-    // template <typename T, class _get_key, class alloc, class comp>
-    // struct RB_Tree_reverse_iterator
-    // {
-    //     typedef alloc allocator_type;
-    //     typedef T value_type;
-    //     typedef std::bidirectional_iterator_tag iterator_category;
-    //     typedef value_type&                                 reference;
-    //     typedef const value_type&                           const_reference;
-    //     typedef typename allocator_type::value_type*        pointer;
-    //     typedef typename allocator_type::value_type const*  const_pointer;
-    //     typedef typename allocator_type::size_type          size_type;
-    //     typedef typename allocator_type::difference_type    difference_type;
-    //     typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-    //     // typedef node_p __node_ptr;
-
-    //     __node_ptr it;
-    //     RB_Tree_reverse_iterator() {}
-    //     RB_Tree_reverse_iterator(__node_ptr node): it(node) {}
-
-    //     reference operator*() {return (it->data);}
-    //     pointer operator->() {return (&(it->data));}
-
-    //     RB_Tree_reverse_iterator &operator++() {it = it->predecessor(it); return *this;}
-    //     RB_Tree_reverse_iterator operator++(int) {RB_Tree_reverse_iterator tmp(*this); ++(*this); return tmp;}
-
-    //     RB_Tree_reverse_iterator &operator--() {it = it->successor(it); return *this;}
-    //     RB_Tree_reverse_iterator operator--(int) {RB_Tree_reverse_iterator tmp(*this); --(*this); return tmp;}
-
-    //     __node_ptr base() const {return it;}
-    //     inline bool operator!=(const RB_Tree_reverse_iterator &lhs)
-    //         { return (this->base() != lhs.base());}
-    //     inline bool operator==(const RB_Tree_reverse_iterator &lhs)
-    //         { return (this->base() == lhs.base()); }
-    // };
-
-    // template <typename T, class _get_key, class alloc, class comp>
-    // struct RB_Tree_const_reverse_iterator
-    // {
-    //     typedef alloc allocator_type;
-    //     typedef T value_type;
-    //     typedef std::bidirectional_iterator_tag iterator_category;
-    //     typedef const value_type&                                 reference;
-    //     // typedef const value_type&                           const_reference;
-    //     typedef typename allocator_type::value_type const*        pointer;
-    //     // typedef typename allocator_type::value_type const*  const_pointer;
-    //     typedef typename allocator_type::size_type          size_type;
-    //     typedef typename allocator_type::difference_type    difference_type;
-    //     typedef typename RBTree<value_type, _get_key, allocator_type, comp>::node_ptr __node_ptr;
-    //     // typedef node_p __node_ptr;
-    //     private:
-    //     typedef RB_Tree_reverse_iterator<T, _get_key, alloc, comp> non_const_reverse_iteratotr;
-    //     public:
-    //     __node_ptr it;
-    //     RB_Tree_const_reverse_iterator() {}
-    //     RB_Tree_const_reverse_iterator(__node_ptr node): it(node) {}
-    //     RB_Tree_const_reverse_iterator(non_const_reverse_iteratotr iter): it(iter.base()) {}
-
-    //     reference operator*() const {return (it->data);}
-    //     pointer operator->() const {return (&(it->data));}
-
-    //     RB_Tree_const_reverse_iterator &operator++() {it = it->predecessor(it); return *this;}
-    //     RB_Tree_const_reverse_iterator operator++(int) {RB_Tree_const_reverse_iterator tmp(*this); ++(*this); return tmp;}
-
-    //     RB_Tree_const_reverse_iterator &operator--() {it = it->successor(it); return *this;}
-    //     RB_Tree_const_reverse_iterator operator--(int) {RB_Tree_const_reverse_iterator tmp(*this); --(*this); return tmp;}
-
-    //     __node_ptr base() const {return it;}
-    //     inline bool operator!=(const RB_Tree_const_reverse_iterator &lhs)
-    //         { return (this->base() != lhs.base());}
-    //     inline bool operator==(const RB_Tree_const_reverse_iterator &lhs)
-    //         { return (this->base() == lhs.base()); }
-    // };
+    template<class InputIterator>
+    typename iterator_traits<InputIterator>::difference_type
+    distance (typename ft::enable_if<std::__is_random_access_iterator<InputIterator>::value, InputIterator>::type first, InputIterator last)
+    {
+        return last - first;
+    }
 
     template<class InputIterator>
     typename iterator_traits<InputIterator>::difference_type
@@ -319,13 +189,6 @@ namespace ft{
         }
         return n;
     }
-}
-
-    template<class _Iter1, class _Iter2>
-    typename ft::iterator_wrap<_Iter1>::difference_type operator-(const ft::iterator_wrap<_Iter1>& x, const ft::iterator_wrap<_Iter2>& y)
-    {
-        return x.base() - y.base();
-    }
 
     template<class _Iter1, class _Iter2>
     typename ft::reverse_iterator<_Iter1>::difference_type operator-(const ft::reverse_iterator<_Iter1>& x, const ft::reverse_iterator<_Iter2>& y)
@@ -333,11 +196,7 @@ namespace ft{
         return y.base() - x.base();
     }
 
-
-
-
-
-template <class _Iter1, class _Iter2>
+    template <class _Iter1, class _Iter2>
 bool operator==(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_Iter2>& __y)
 {
     return __x.base() == __y.base();
@@ -372,8 +231,6 @@ bool operator<=(const ft::iterator_wrap<_Iter1>& __x, const ft::iterator_wrap<_I
 {
     return __x.base() >= __y.base();
 }
-
-
 
 template <class _Iter1, class _Iter2>
 bool operator==(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_iterator<_Iter2>& __y)
@@ -410,6 +267,17 @@ bool operator<=(const ft::reverse_iterator<_Iter1>& __x, const ft::reverse_itera
 {
     return __x.base() >= __y.base();
 }
+}
+
+
+
+
+
+
+
+
+
+
 
 
 #endif

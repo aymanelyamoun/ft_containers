@@ -60,6 +60,7 @@ namespace ft
 		typedef typename RB_tree::iterator iterator;
 		typedef typename RB_tree::const_iterator const_iterator;
 		typedef typename RB_tree::reverse_iterator reverse_iterator;
+		typedef typename RB_tree::const_reverse_iterator const_reverse_iterator;
 
 		map() : tree(key_comp()) {}
 		explicit map (const key_compare& _comp, const allocator_type& alloc = allocator_type())
